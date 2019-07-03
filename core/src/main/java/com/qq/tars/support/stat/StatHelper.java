@@ -75,7 +75,11 @@ public final class StatHelper {
                 StatMicMsgHead mHead = new StatMicMsgHead(head.getMasterName(), head.getSlaveName(), head.getInterfaceName(), head.getMasterIp(), head.getSlaveIp(), head.getSlavePort(), head.getReturnValue(), head.getSlaveSetName(), head.getSlaveSetArea(), head.getSlaveSetID(), head.getTafVersion());
                 reprotMap.put(mHead, mbody);
 
-                ClientLogger.getLogger().info("report call|" + statHead.getKey().masterName + "|" + statHead.getKey().slaveIp + ":" + statHead.getKey().slavePort + "|" + statHead.getKey().slaveName + "." + statHead.getKey().interfaceName + "_" + statHead.getKey().getReturnValue() + "(" + statHead.getKey().slaveSetName + "." + statHead.getKey().slaveSetArea + "." + statHead.getKey().slaveSetID + "):" + mbody.count + "_" + mbody.execCount + "_" + mbody.timeoutCount + "_" + mbody.totalRspTime + "_" + mbody.maxRspTime + "_" + mbody.minRspTime);
+                ClientLogger.getLogger().info("report call|" + statHead.getKey().masterName + "|" +
+                        statHead.getKey().slaveIp + ":" + statHead.getKey().slavePort + "|" + statHead.getKey().slaveName + "." +
+                        statHead.getKey().interfaceName + "_" + statHead.getKey().getReturnValue() +
+                        "(" + statHead.getKey().slaveSetName + "." + statHead.getKey().slaveSetArea + "." + statHead.getKey().slaveSetID + "):" +
+                        mbody.count + "_" + mbody.execCount + "_" + mbody.timeoutCount + "_" + mbody.totalRspTime + "_" + mbody.maxRspTime + "_" + mbody.minRspTime);
                 i++;
                 if (i % BATCH_REPORTS == 0) {
                     try {

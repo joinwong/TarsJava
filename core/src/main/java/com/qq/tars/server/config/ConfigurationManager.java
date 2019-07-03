@@ -22,6 +22,10 @@ import com.qq.tars.common.util.StringUtils;
 
 import java.io.IOException;
 
+/**
+ * 配置管理
+ * 拉取服务的配置信息
+ */
 public class ConfigurationManager {
 
     private static final ConfigurationManager instance = new ConfigurationManager();

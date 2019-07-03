@@ -54,6 +54,7 @@ public class Server {
 //
 //            startManagerService();
 
+            //启动app上线文
             startAppContext(appContext);
 
             startSessionManager();

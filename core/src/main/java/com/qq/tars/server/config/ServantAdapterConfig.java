@@ -19,6 +19,10 @@ package com.qq.tars.server.config;
 import com.qq.tars.common.support.Endpoint;
 import com.qq.tars.common.util.Config;
 
+/**
+ * Servant 适配器配置
+ * 拉取每个servant的配置信息
+ */
 public class ServantAdapterConfig {
 
     private Endpoint endpoint = null;

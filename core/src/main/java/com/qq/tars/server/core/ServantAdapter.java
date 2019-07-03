@@ -38,6 +38,9 @@ import com.qq.tars.server.config.ConfigurationManager;
 import com.qq.tars.server.config.ServantAdapterConfig;
 import com.qq.tars.server.config.ServerConfig;
 
+/**
+ * servant适配器
+ */
 public class ServantAdapter implements Adapter {
 
     private SelectorManager selectorManager = null;
@@ -54,21 +57,28 @@ public class ServantAdapter implements Adapter {
         ServerConfig serverCfg = ConfigurationManager.getInstance().getServerConfig();
 
         boolean keepAlive = true;
+        //默认utf8
         Codec codec = new TarsCodec(serverCfg.getCharsetName());
+        //processor处理器
         Processor processor = new TarsServantProcessor();
+        //获取线程池配置并缓存
         Executor threadPool = ServantThreadPoolManager.get(servantAdapterConfig);
 
+        //获取EndPoint
         Endpoint endpoint = this.servantAdapterConfig.getEndpoint();
         if (endpoint.type().equals("tcp")) {
+            //启动线程
             this.selectorManager = new SelectorManager(Utils.getSelectorPoolSize(), new ServantProtocolFactory(codec), threadPool, processor, keepAlive, "server-tcp-reactor", false);
             this.selectorManager.setTcpNoDelay(serverCfg.isTcpNoDelay());
             this.selectorManager.start();
 
+            //启动TCP Java NIO
             System.out.println("[SERVER] server starting at " + endpoint + "...");
             ServerSocketChannel serverChannel = ServerSocketChannel.open();
             serverChannel.socket().bind(new InetSocketAddress(endpoint.host(), endpoint.port()), 1024);
             serverChannel.configureBlocking(false);
 
+            //注册到线程池中的第一个线程中
             selectorManager.getReactor(0).registerChannel(serverChannel, SelectionKey.OP_ACCEPT);
 
             System.out.println("[SERVER] server started at " + endpoint + "...");
@@ -78,16 +88,19 @@ public class ServantAdapter implements Adapter {
             this.selectorManager = new SelectorManager(1, new ServantProtocolFactory(codec), threadPool, processor, false, "server-udp-reactor", true);
             this.selectorManager.start();
 
+            //启动UDP
             System.out.println("[SERVER] server starting at " + endpoint + "...");
             DatagramChannel serverChannel = DatagramChannel.open();
             DatagramSocket socket = serverChannel.socket();
             socket.bind(new InetSocketAddress(endpoint.host(), endpoint.port()));
             serverChannel.configureBlocking(false);
 
+            //注册到线程池中的第一个线程中
             this.selectorManager.getReactor(0).registerChannel(serverChannel, SelectionKey.OP_READ);
             System.out.println("[SERVER] servant started at " + endpoint + "...");
         }
     }
+
 
     public void bind(AppService appService) throws IOException {
         this.skeleton = (ServantHomeSkeleton) appService;

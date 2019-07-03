@@ -34,10 +34,15 @@ import com.qq.tars.support.trace.TraceServerFilter;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * 基础App上下文类
+ */
 public abstract class BaseAppContext implements AppContext {
     boolean ready = true;
 
+    //框架map
     ConcurrentHashMap<String, ServantHomeSkeleton> skeletonMap = new ConcurrentHashMap<String, ServantHomeSkeleton>();
+    //是配置map
     ConcurrentHashMap<String, Adapter> servantAdapterMap = new ConcurrentHashMap<String, Adapter>();
 
     HashMap<String, String> contextParams = new HashMap<String, String>();
@@ -53,10 +58,14 @@ public abstract class BaseAppContext implements AppContext {
     @Override
     public void init() {
         try {
+            //加载servant，由各个实现类
             loadServants();
             //inject om admin servant
+            //诸如管理servant
             injectAdminServant();
+            //初始化servant
             initServants();
+            //app上下文启动
             appContextStarted();
             System.out.println("[SERVER] The application started successfully.");
         } catch (Exception ex) {
@@ -75,6 +84,9 @@ public abstract class BaseAppContext implements AppContext {
         }
     }
 
+    /**
+     * 注入管理servant
+     */
     void injectAdminServant() {
         try {
             String skeletonName = OmConstants.AdminServant;
@@ -100,6 +112,9 @@ public abstract class BaseAppContext implements AppContext {
         }
     }
 
+    /**
+     * 初始化servant
+     */
     void initServants() {
         for (String skeletonName : skeletonMap.keySet()) {
             ServantHomeSkeleton skeleton = skeletonMap.get(skeletonName);

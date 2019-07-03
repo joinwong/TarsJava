@@ -25,6 +25,9 @@ import java.io.File;
 import java.util.LinkedHashMap;
 import java.util.List;
 
+/**
+ * Server 配置信息
+ */
 public class ServerConfig {
 
     private String application;

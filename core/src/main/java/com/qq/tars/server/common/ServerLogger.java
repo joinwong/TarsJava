@@ -21,6 +21,9 @@ import java.io.PrintStream;
 import com.qq.tars.support.log.Logger;
 import com.qq.tars.support.log.LoggingOutputStream;
 
+/**
+ * 日期配置
+ */
 public final class ServerLogger {
 
     private static final String STDOUT_log_NAME = "stdout.log";
