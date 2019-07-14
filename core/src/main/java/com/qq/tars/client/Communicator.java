@@ -36,6 +36,9 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
+/**
+ * 通讯器
+ */
 public final class Communicator {
 
     private volatile String id;

@@ -24,6 +24,9 @@ import java.util.Iterator;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.locks.ReentrantLock;
 
+/**
+ * Servant 代理工厂类
+ */
 class ServantProxyFactory {
 
     private final ReentrantLock lock = new ReentrantLock();
@@ -55,6 +58,13 @@ class ServantProxyFactory {
         return proxy;
     }
 
+    /**
+     * 生成代理
+     * @param clazz
+     * @param objectProxy
+     * @param <T>
+     * @return
+     */
     private <T> Object createProxy(Class<T> clazz, ObjectProxy<T> objectProxy) {
         return Proxy.newProxyInstance(Thread.currentThread().getContextClassLoader(), new Class[]{clazz, ServantProxy.class}, objectProxy);
     }

@@ -42,6 +42,9 @@ import com.qq.tars.rpc.exc.TimeoutException;
 import com.qq.tars.rpc.protocol.ServantRequest;
 import com.qq.tars.rpc.protocol.ServantResponse;
 
+/**
+ * 客户端servant
+ */
 public class ServantClient {
 
     private Session session = null;
@@ -81,6 +84,7 @@ public class ServantClient {
                 event = SelectionKey.OP_READ;
                 temp.setStatus(SessionStatus.CLIENT_CONNECTED);
             } else {
+                //开启scoketChannel javaNIO
                 channel = SocketChannel.open();
                 channel.configureBlocking(false);
                 try {
@@ -90,6 +94,7 @@ public class ServantClient {
                 } catch (Exception ex) {
                     ClientLogger.getLogger().error(ex.getLocalizedMessage());
                 }
+                //连接服务端
                 ((SocketChannel) channel).connect(server);
 
                 temp = new TCPSession(this.selectorManager);
@@ -125,6 +130,13 @@ public class ServantClient {
         }
     }
 
+    /**
+     * 同步调用
+     * @param request
+     * @param <T>
+     * @return
+     * @throws IOException
+     */
     public <T extends ServantResponse> T invokeWithSync(ServantRequest request) throws IOException {
         Ticket<T> ticket = null;
         T response = null;
@@ -134,7 +146,9 @@ public class ServantClient {
             ticket = TicketManager.createTicket(request, session, this.syncTimeout);
 
             Session current = session;
+            //发送请求
             current.write(request);
+            //判断是否超时
             if (!ticket.await(this.syncTimeout, TimeUnit.MILLISECONDS)) {
                 if (current != null && current.getStatus() != SessionStatus.CLIENT_CONNECTED) {
                     throw new IOException("Connection reset by peer|" + this.getAddress());
@@ -142,6 +156,7 @@ public class ServantClient {
                     throw new TimeoutException("the operation has timeout, " + this.syncTimeout + "ms|" + this.getAddress());
                 }
             }
+            //拿到返回值
             response = ticket.response();
             if (response == null) {
                 throw new IOException("the operation is failed.");
@@ -157,6 +172,13 @@ public class ServantClient {
         return response;
     }
 
+    /**
+     * 异步调用
+     * @param request
+     * @param callback
+     * @param <T>
+     * @throws IOException
+     */
     public <T extends ServantResponse> void invokeWithAsync(ServantRequest request, Callback<T> callback) throws IOException {
         Ticket<T> ticket = null;
 
@@ -175,6 +197,13 @@ public class ServantClient {
         }
     }
 
+    /**
+     * Future调用
+     * @param request
+     * @param <T>
+     * @return
+     * @throws IOException
+     */
     public <T extends ServantResponse> Future<T> invokeWithFuture(ServantRequest request) throws IOException {
         Ticket<T> ticket = null;
         try {
@@ -184,6 +213,7 @@ public class ServantClient {
 
             Session current = session;
             current.write(request);
+            //返回Future
             return new FutureImpl<T>(ticket);
         } catch (Exception ex) {
             if (ticket != null) {

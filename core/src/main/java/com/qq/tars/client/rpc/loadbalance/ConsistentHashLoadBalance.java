@@ -30,6 +30,10 @@ import com.qq.tars.rpc.common.exc.NoInvokerException;
 
 import java.util.*;
 
+/**
+ * 一致性hash
+ * @param <T>
+ */
 public class ConsistentHashLoadBalance<T> implements LoadBalance<T> {
 
     private final ServantProxyConfig config;

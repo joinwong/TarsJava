@@ -26,6 +26,9 @@ import java.util.Map;
 import com.qq.tars.common.util.HexUtil;
 import com.qq.tars.protocol.tars.exc.TarsEncodeException;
 
+/**
+ * 输入流
+ */
 public class TarsOutputStream {
 
     private ByteBuffer bs;
@@ -46,12 +49,20 @@ public class TarsOutputStream {
         return bs;
     }
 
+    /**
+     * ByteBuffer转换为byte[]
+     * @return
+     */
     public byte[] toByteArray() {
         byte[] newBytes = new byte[bs.position()];
         System.arraycopy(bs.array(), 0, newBytes, 0, bs.position());
         return newBytes;
     }
 
+    /**
+     * 判断预留空间是否够用，不够就扩容(double)
+     * @param len
+     */
     public void reserve(int len) {
         if (bs.remaining() < len) {
             int n = (bs.capacity() + len) * 2;
@@ -62,6 +73,7 @@ public class TarsOutputStream {
         }
     }
 
+    //| Type(4 bits) | Tag 1(4 bits) | Tag 2(1 byte) |
     public void writeHead(byte type, int tag) {
         if (tag < 15) {
             byte b = (byte) ((tag << 4) | type);
@@ -224,7 +236,7 @@ public class TarsOutputStream {
     }
 
     public void write(long[] l, int tag) {
-        reserve(8);
+        reserve(8); //这里为什么不直接 8+l.length*8
         writeHead(TarsStructBase.LIST, tag);
         write(l.length, 0);
         for (long e : l)
@@ -361,9 +373,22 @@ public class TarsOutputStream {
     public static void main(String[] args) {
         TarsOutputStream os = new TarsOutputStream();
         long n = 0x1234567890012345L;
+        System.out.println("输入值:"+n);
         os.write(n, 0);
         ByteBuffer bs = os.getByteBuffer();
-        System.out.println(HexUtil.bytes2HexStr(bs.array()));
+        //System.out.println(HexUtil.bytes2HexStr(bs.array()));
         System.out.println(Arrays.toString(os.toByteArray()));
+
+//        System.out.println("old position:"+bs.position());
+        bs.position(0);
+//        System.out.println("new position:"+bs.position());
+
+        TarsInputStream is = new TarsInputStream(bs);
+//        is.setServerEncoding("UTF-8");
+//        System.out.println(is.toString());
+        long r = 0L;
+        TarsInputStream.HeadData hd = new TarsInputStream.HeadData();
+        //is.readHead(hd);
+        System.out.println("原始值:"+is.read(r,hd.tag,true));
     }
 }

@@ -25,6 +25,10 @@ import com.qq.tars.rpc.common.InvokeContext;
 import com.qq.tars.rpc.common.Url;
 import com.qq.tars.rpc.common.support.AbstractInvoker;
 
+/**
+ * ServantInvoker
+ * @param <T>
+ */
 public abstract class ServantInvoker<T> extends AbstractInvoker<T> {
 
     protected final String objName;

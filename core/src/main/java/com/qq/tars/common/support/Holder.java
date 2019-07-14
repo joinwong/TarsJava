@@ -16,6 +16,10 @@
 
 package com.qq.tars.common.support;
 
+/**
+ * 包装器
+ * @param <T>
+ */
 public class Holder<T> {
 
     public T value;

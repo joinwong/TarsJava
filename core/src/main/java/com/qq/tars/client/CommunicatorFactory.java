@@ -20,6 +20,9 @@ import java.util.concurrent.ConcurrentHashMap;
 
 import com.qq.tars.client.util.ParseTools;
 
+/**
+ * 通讯器工厂类
+ */
 public final class CommunicatorFactory {
 
     private final static CommunicatorFactory instance = new CommunicatorFactory();

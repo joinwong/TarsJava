@@ -16,6 +16,9 @@
 
 package com.qq.tars.common.support;
 
+/**
+ * IP PORT
+ */
 public class Endpoint {
 
     private final String type;

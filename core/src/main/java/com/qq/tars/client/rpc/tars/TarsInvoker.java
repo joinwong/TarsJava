@@ -92,6 +92,7 @@ public class TarsInvoker<T> extends ServantInvoker<T> {
         } finally {
             if (!isAsync) {
                 setAvailable(ServantnvokerAliveChecker.isAlive(getUrl(), config, ret));
+                //每次客户端调用上报
                 InvokeStatHelper.getInstance().addProxyStat(objName).addInvokeTimeByClient(config.getMasterName(), config.getSlaveName(), config.getSlaveSetName(), config.getSlaveSetArea(), config.getSlaveSetID(), inv.getMethodName(), getUrl().getHost(), getUrl().getPort(), ret, System.currentTimeMillis() - begin);
             }
         }
@@ -101,6 +102,14 @@ public class TarsInvoker<T> extends ServantInvoker<T> {
         return clients.length == 1 ? clients[0] : clients[(index.getAndIncrement() & Integer.MAX_VALUE) % clients.length];
     }
 
+    /**
+     * 真实的包
+     * @param method
+     * @param args
+     * @param context
+     * @return
+     * @throws Throwable
+     */
     private TarsServantResponse invokeWithSync(Method method, Object args[], Map<String, String> context) throws Throwable {
         ServantClient client = getClient();
         TarsServantRequest request = new TarsServantRequest(client.getIoSession());

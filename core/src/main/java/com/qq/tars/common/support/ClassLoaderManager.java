@@ -19,6 +19,9 @@ package com.qq.tars.common.support;
 import java.util.HashMap;
 import java.util.Map;
 
+/**
+ * 类加载器
+ */
 public class ClassLoaderManager {
 
     private static final ClassLoaderManager instance = new ClassLoaderManager();

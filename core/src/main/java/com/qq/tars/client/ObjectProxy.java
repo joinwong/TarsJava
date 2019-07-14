@@ -144,6 +144,7 @@ public final class ObjectProxy<T> implements ServantProxy, InvocationHandler {
             this.registryStatReproter();
         }
         if (!servantProxyConfig.isDirectConnection()) {
+            //非直连，每60秒刷新一次servant node
             this.registryServantNodeRefresher();
         }
     }

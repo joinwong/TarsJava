@@ -65,6 +65,7 @@ public class TarsCodec extends Codec {
                 jos.write(response.getRequestId(), 3);
                 jos.write(response.getMessageType(), 4);
                 jos.write(response.getRet(), 5);
+                //返回值
                 jos.write(encodeResult(response, charsetName), 6);
                 if (response.getStatus() != null) {
                     jos.write(response.getStatus(), 7);
@@ -78,6 +79,7 @@ public class TarsCodec extends Codec {
                 String servantName = response.getRequest().getServantName();
                 jos.write(servantName, 5);
                 jos.write(response.getRequest().getFunctionName(), 6);
+                //返回值
                 jos.write(encodeWupResult(response, charsetName), 7);
                 jos.write(response.getTimeout(), 8);
                 if (response.getContext() != null) {
@@ -98,11 +100,19 @@ public class TarsCodec extends Codec {
         ByteBuffer buffer = jos.getByteBuffer();
         int datalen = buffer.position();
         buffer.position(0);
+        //设置包的大小
         buffer.putInt(datalen);
         buffer.position(datalen);
         return IoBuffer.wrap(jos.toByteArray());
     }
 
+    /**
+     * 这里是1.0版本，已经废弃
+     *
+     * @param response
+     * @param charsetName
+     * @return
+     */
     protected byte[] encodeResult(TarsServantResponse response, String charsetName) {
         TarsServantRequest request = response.getRequest();
         if (TarsHelper.isPing(request.getFunctionName())) {
@@ -112,6 +122,7 @@ public class TarsCodec extends Codec {
         TarsOutputStream ajos = new TarsOutputStream();
         ajos.setServerEncoding(charsetName);
 
+        //返回值
         int ret = response.getRet();
         Map<String, TarsMethodInfo> methodInfoMap = AnalystManager.getInstance().getMethodMapByName(request.getServantName());
         if (ret == TarsHelper.SERVERSUCCESS && methodInfoMap != null) {
@@ -128,6 +139,7 @@ public class TarsCodec extends Codec {
             Object value = null;
             List<TarsMethodParameterInfo> parametersList = methodInfo.getParametersList();
             for (TarsMethodParameterInfo parameterInfo : parametersList) {
+                //out返回值，使用Holder包装
                 if (TarsHelper.isHolder(parameterInfo.getAnnotations())) {
                     value = request.getMethodParameters()[parameterInfo.getOrder() - 1];
                     if (value != null) {
@@ -181,6 +193,13 @@ public class TarsCodec extends Codec {
         return unaOut.encode();
     }
 
+    /**
+     * encode 请求
+     * @param req
+     * @param session
+     * @return
+     * @throws ProtocolException
+     */
     public IoBuffer encodeRequest(Request req, Session session) throws ProtocolException {
         TarsServantRequest request = (TarsServantRequest) req;
         request.setCharsetName(charsetName);
@@ -194,6 +213,7 @@ public class TarsCodec extends Codec {
         os.write(request.getTicketNumber(), 4);
         os.write(request.getServantName(), 5);
         os.write(request.getFunctionName(), 6);
+        //输入参数二进制流
         os.write(encodeRequestParams(request, charsetName), 7);
         os.write(request.getTimeout(), 8);
         os.write(request.getContext(), 9);
@@ -210,6 +230,13 @@ public class TarsCodec extends Codec {
         return IoBuffer.wrap(os.getByteBuffer());
     }
 
+    /**
+     * encode 请求参数
+     * @param request
+     * @param charsetName
+     * @return
+     * @throws ProtocolException
+     */
     protected byte[] encodeRequestParams(TarsServantRequest request, String charsetName) throws ProtocolException {
         TarsOutputStream os = new TarsOutputStream(0);
         os.setServerEncoding(charsetName);
@@ -220,12 +247,16 @@ public class TarsCodec extends Codec {
         Object value = null;
         Object[] parameter = request.getMethodParameters();
         for (TarsMethodParameterInfo parameterInfo : parameterInfoList) {
+            //不处理TarsContext和TarsCallBack
             if (TarsHelper.isContext(parameterInfo.getAnnotations()) || TarsHelper.isCallback(parameterInfo.getAnnotations())) {
                 continue;
             }
 
+            //是否异步请求
+            //异步请求第0个存放的是callback
             value = parameter[request.isAsync() ? parameterInfo.getOrder() : parameterInfo.getOrder() - 1];
             if (TarsHelper.isHolder(parameterInfo.getAnnotations()) && value != null) {
+                //返回值Holder
                 try {
                     value = TarsHelper.getHolderValue(value);
                 } catch (Exception e) {
@@ -235,17 +266,27 @@ public class TarsCodec extends Codec {
                     os.write(value, parameterInfo.getOrder());
                 }
             } else if (value != null) {
+                //写入IO
                 os.write(value, parameterInfo.getOrder());
             }
         }
         return os.toByteArray();
     }
 
+    /**
+     * decode 请求
+     * @param buffer
+     * @param session
+     * @return
+     * @throws ProtocolException
+     */
     public Request decodeRequest(IoBuffer buffer, Session session) throws ProtocolException {
         if (buffer.remaining() < 4) {
+            //Head 至少4个字节
             return null;
         }
         int length = buffer.getInt() - TarsHelper.HEAD_SIZE;
+        //大于10M
         if (length > TarsHelper.PACKAGE_MAX_LENGTH || length <= 0) {
             throw new ProtocolException("the length header of the package must be between 0~10M bytes. data length:" + Integer.toHexString(length));
         }
@@ -279,6 +320,11 @@ public class TarsCodec extends Codec {
         return request;
     }
 
+    /**
+     * decode 请求包体
+     * @param req
+     * @return
+     */
     public ServantRequest decodeRequestBody(ServantRequest req) {
         TarsServantRequest request = (TarsServantRequest) req;
         if (request.getRet() != TarsHelper.SERVERSUCCESS) {
@@ -387,6 +433,13 @@ public class TarsCodec extends Codec {
         return parameters;
     }
 
+    /**
+     * decode response
+     * @param buffer
+     * @param session
+     * @return
+     * @throws ProtocolException
+     */
     public Response decodeResponse(IoBuffer buffer, Session session) throws ProtocolException {
         if (buffer.remaining() < TarsHelper.HEAD_SIZE) {
             return null;
@@ -421,15 +474,22 @@ public class TarsCodec extends Codec {
         return response;
     }
 
+    /**
+     * decode response body
+     * @param resp
+     * @throws ProtocolException
+     */
     public void decodeResponseBody(ServantResponse resp) throws ProtocolException {
         TarsServantResponse response = (TarsServantResponse) resp;
 
         TarsServantRequest request = response.getRequest();
         if (request.isAsync()) {
+            //异步请求直接返回
             return;
         }
         TarsInputStream is = response.getInputStream();
 
+        //读取二进制流
         byte[] data = is.read(new byte[]{}, 6, true);
         TarsInputStream jis = new TarsInputStream(data);
         jis.setServerEncoding(response.getCharsetName());
@@ -455,6 +515,7 @@ public class TarsCodec extends Codec {
                 continue;
             }
             try {
+                //设置输出Holder值
                 TarsHelper.setHolderValue(request.getMethodParameters()[info.getOrder() - 1], results[i++]);
             } catch (Exception e) {
                 throw new ProtocolException(e);
@@ -488,7 +549,14 @@ public class TarsCodec extends Codec {
         return values.toArray();
     }
 
+    /**
+     * 解析callback参数
+     * @param response
+     * @return
+     * @throws ProtocolException
+     */
     public Object[] decodeCallbackArgs(TarsServantResponse response) throws ProtocolException {
+        //读取输出二进制流
         byte[] data = response.getInputStream().read(new byte[]{}, 6, true);
 
         TarsServantRequest request = response.getRequest();

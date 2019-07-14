@@ -34,6 +34,10 @@ public final class TarsInputStream {
 
     private ByteBuffer bs; // 缓冲区
 
+    /**
+     * 头信息
+     * | Type(4 bits) | Tag 1(4 bits) | Tag 2(1 byte) |
+     */
     public static class HeadData {
 
         public byte type;
@@ -70,11 +74,20 @@ public final class TarsInputStream {
         this.bs = ByteBuffer.wrap(bs);
     }
 
+    /**
+     * 读取头信息
+     * @param hd
+     * @param bb
+     * @return
+     */
     public static int readHead(HeadData hd, ByteBuffer bb) {
         byte b = bb.get();
+        //type
         hd.type = (byte) (b & 15);
+        //tag1
         hd.tag = ((b & (15 << 4)) >> 4);
         if (hd.tag == 15) {
+            //继续读tag2字节
             hd.tag = (bb.get() & 0x00ff);
             return 2;
         }
@@ -89,6 +102,10 @@ public final class TarsInputStream {
         return readHead(hd, bs.duplicate());
     }
 
+    /**
+     * 字节移动
+     * @param len
+     */
     private void skip(int len) {
         bs.position(bs.position() + len);
     }

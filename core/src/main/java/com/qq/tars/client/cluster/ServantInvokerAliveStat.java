@@ -77,6 +77,7 @@ public class ServantInvokerAliveStat {
             netConnectTimeout = true;
         }
 
+        //超过60秒直接重置 超时信息
         if ((timeout_startTime + config.getCheckInterval()) < System.currentTimeMillis()) {
             timeoutCount = 0;
             failedCount = 0;
@@ -86,8 +87,10 @@ public class ServantInvokerAliveStat {
 
         if (alive) {
             long totalCount = timeoutCount + failedCount + succCount;
+            //超时次数大于20
             if (timeoutCount >= config.getMinTimeoutInvoke()) {
                 double radio = div(timeoutCount, totalCount, 2);
+                //超时比例大于0.5f
                 if (radio > config.getFrequenceFailRadio()) {
                     alive = false;
                     ClientLogger.getLogger().info(identity + "|alive=false|radio=" + radio + "|" + toString());
@@ -95,13 +98,16 @@ public class ServantInvokerAliveStat {
             }
 
             if (alive) {
-                if (frequenceFailInvoke >= config.getFrequenceFailInvoke() && (frequenceFailInvoke_startTime + 5000) > System.currentTimeMillis()) {
+                //5秒内frequenceFailInvoke失败次数>=50 &&
+                if (frequenceFailInvoke >= config.getFrequenceFailInvoke()
+                        && (frequenceFailInvoke_startTime + 5000) > System.currentTimeMillis()) {
                     alive = false;
                     ClientLogger.getLogger().info(identity + "|alive=false|frequenceFailInvoke=" + frequenceFailInvoke + "|" + toString());
                 }
             }
 
             if (alive) {
+                //未连接到服务直接设置alive为false
                 if (netConnectTimeout) {
                     alive = false;
                     ClientLogger.getLogger().info(identity + "|alive=false|netConnectTimeout" + "|" + toString());

@@ -46,18 +46,22 @@ class ObjectProxyFactory {
     public <T> ObjectProxy<T> getObjectProxy(Class<T> api, String objName, String setDivision, ServantProxyConfig servantProxyConfig,
                                              LoadBalance<T> loadBalance, ProtocolInvoker<T> protocolInvoker) throws ClientException {
         if (servantProxyConfig == null) {
+            //创建默认的servantProxy
             servantProxyConfig = createServantProxyConfig(objName, setDivision);
         } else {
             servantProxyConfig.setCommunicatorId(communicator.getId());
             servantProxyConfig.setModuleName(communicator.getCommunicatorConfig().getModuleName(), communicator.getCommunicatorConfig().isEnableSet(), communicator.getCommunicatorConfig().getSetDivision());
             servantProxyConfig.setLocator(communicator.getCommunicatorConfig().getLocator());
             if (StringUtils.isNotEmpty(setDivision)) {
+                //分区
                 servantProxyConfig.setSetDivision(setDivision);
             }
         }
 
+        //更新servant的ip/port
         updateServantEndpoints(servantProxyConfig);
 
+        //负载均衡器
         if (loadBalance == null) {
             loadBalance = createLoadBalance(servantProxyConfig);
         }
@@ -123,11 +127,17 @@ class ObjectProxyFactory {
         return cfg;
     }
 
+    /**
+     * 更新servant服务的endpoints
+     * @param cfg
+     */
     private void updateServantEndpoints(ServantProxyConfig cfg) {
         CommunicatorConfig communicatorConfig = communicator.getCommunicatorConfig();
 
         String endpoints = null;
-        if (!ParseTools.hasServerNode(cfg.getObjectName()) && !cfg.isDirectConnection() && !communicatorConfig.getLocator().startsWith(cfg.getSimpleObjectName())) {
+        if (!ParseTools.hasServerNode(cfg.getObjectName()) //没有配置server node
+                && !cfg.isDirectConnection()  //非直连
+                && !communicatorConfig.getLocator().startsWith(cfg.getSimpleObjectName())) {
             try {
                 /** 从主控拉取server node */
                 if (RegisterManager.getInstance().getHandler() != null) {
@@ -139,6 +149,7 @@ class ObjectProxyFactory {
                 if (StringUtils.isEmpty(endpoints)) {
                     throw new CommunicatorConfigException(cfg.getSimpleObjectName(), "servant node is empty on get by registry! communicator id=" + communicator.getId());
                 }
+                //缓存到本地
                 ServantCacheManager.getInstance().save(communicator.getId(), cfg.getSimpleObjectName(), endpoints, communicatorConfig.getDataPath());
             } catch (CommunicatorConfigException e) {
                 /** 如果失败，从本地绶存文件中拉取 */
