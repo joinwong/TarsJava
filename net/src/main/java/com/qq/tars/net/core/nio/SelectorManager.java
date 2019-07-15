@@ -25,6 +25,9 @@ import java.util.concurrent.atomic.AtomicLong;
 import com.qq.tars.net.core.Processor;
 import com.qq.tars.net.protocol.ProtocolFactory;
 
+/**
+ * 选择器管理
+ */
 public final class SelectorManager {
 
     private final AtomicLong sets = new AtomicLong(0);
@@ -62,11 +65,15 @@ public final class SelectorManager {
 
         reactorSet = new Reactor[selectorPoolSize];
 
+        //初始化反应器堆
         for (int i = 0; i < reactorSet.length; i++) {
             reactorSet[i] = new Reactor(this, reactorNamePrefix + "-" + protocolFactory.getClass().getSimpleName().toLowerCase() + "-" + String.valueOf(i), udpMode);
         }
     }
 
+    /**
+     * 启动所有的反应器
+     */
     public synchronized void start() {
         if (this.started) {
             return;
@@ -78,6 +85,9 @@ public final class SelectorManager {
         }
     }
 
+    /**
+     * 关闭所有的反应器
+     */
     public synchronized void stop() {
         if (!this.started) return;
 

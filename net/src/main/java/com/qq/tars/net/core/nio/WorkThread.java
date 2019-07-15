@@ -75,11 +75,14 @@ public final class WorkThread implements Runnable {
             }
 
             if (req != null) {
+                //输入
                 req.setProcessTime(System.currentTimeMillis());
                 req.init();
                 Response res = selectorManager.getProcessor().process(req, req.getIoSession());
+                //非异步模式，TCPSession写入response
                 if (!res.isAsyncMode()) req.getIoSession().write(res);
             } else if (resp != null) {
+                //输出
                 resp.init();
                 Ticket<Response> ticket = TicketManager.getTicket(resp.getTicketNumber());
                 if (ticket == null) {
@@ -88,8 +91,11 @@ public final class WorkThread implements Runnable {
                     return;
                 }
                 fillDitributedContext(ticket.request().getDistributedContext());
+                //通知response
                 ticket.notifyResponse(resp);
+                //更新计数器
                 ticket.countDown();
+                //移除该ticket
                 TicketManager.removeTicket(ticket.getTicketNumber());
             }
         } catch (Exception ex) {

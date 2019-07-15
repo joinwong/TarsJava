@@ -19,6 +19,10 @@ package com.qq.tars.net.core.nio;
 import java.io.IOException;
 import java.nio.channels.SelectionKey;
 
+/**
+ * 选择器接口类
+ * 这里主要是JavaNIO
+ */
 public abstract class Acceptor {
 
     protected SelectorManager selectorManager = null;

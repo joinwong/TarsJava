@@ -21,6 +21,9 @@ import java.nio.channels.SelectionKey;
 
 import com.qq.tars.net.core.Session.SessionStatus;
 
+/**
+ * UDP选择器
+ */
 public class UDPAcceptor extends Acceptor {
 
     private int bufferSize;

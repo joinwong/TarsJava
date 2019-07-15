@@ -25,6 +25,9 @@ import com.qq.tars.net.core.SessionEvent;
 import com.qq.tars.net.core.SessionListener;
 import com.qq.tars.net.core.SessionManager;
 
+/**
+ * 会话管理
+ */
 public class SessionManagerImpl extends SessionManager {
 
     private long timeout = 1000 * 60 * 1;
@@ -84,6 +87,7 @@ public class SessionManagerImpl extends SessionManager {
 
                 while (true) {
                     try {
+                        //每隔30秒进行session超时判断
                         for (Session session : sessionList) {
                             lastUpdateOperationTime = session.getLastOperationTime();
                             if ((System.currentTimeMillis() - lastUpdateOperationTime) > timeout) {

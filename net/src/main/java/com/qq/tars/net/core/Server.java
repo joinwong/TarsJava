@@ -32,6 +32,9 @@ import com.qq.tars.net.core.nio.SelectorManager;
 import com.qq.tars.net.protocol.ProtocolFactory;
 import com.qq.tars.net.util.Utils;
 
+/**
+ * 服务端Server
+ */
 public abstract class Server {
 
     private String host = null;
@@ -42,10 +45,12 @@ public abstract class Server {
 
     private ProtocolFactory protocolFactory = null;
 
+    //选择器管理
     private SelectorManager selectorManager = null;
 
     private Processor processor = null;
 
+    //线程池
     private Executor threadPool = null;
 
     private Properties props = new Properties();

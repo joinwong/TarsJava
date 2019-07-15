@@ -23,6 +23,9 @@ import java.util.concurrent.TimeUnit;
 
 import com.qq.tars.net.protocol.ProtocolFactory;
 
+/**
+ * 会话：有TCPSession和UDPSession
+ */
 public abstract class Session {
 
     protected SessionStatus status = SessionStatus.NOT_CONNECTED;

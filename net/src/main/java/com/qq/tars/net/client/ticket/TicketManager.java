@@ -26,12 +26,18 @@ import com.qq.tars.net.client.Callback;
 import com.qq.tars.net.core.Request;
 import com.qq.tars.net.core.Session;
 
+/**
+ * Ticket管理
+ */
 public class TicketManager {
 
     private static ConcurrentHashMap<Integer, Ticket<?>> tickets = new ConcurrentHashMap<Integer, Ticket<?>>();
 
     private static ScheduledExecutorService executor = Executors.newSingleThreadScheduledExecutor();
 
+    /**
+     * 每隔500毫秒，检查Ticket是否过期并剔除已过期Ticket
+     */
     static {
         executor.scheduleAtFixedRate(new Runnable() {
 

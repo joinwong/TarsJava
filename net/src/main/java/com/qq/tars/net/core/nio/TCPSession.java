@@ -34,6 +34,9 @@ import com.qq.tars.net.core.SessionManager;
 import com.qq.tars.net.protocol.ProtocolException;
 import com.qq.tars.net.protocol.ProtocolFactory;
 
+/**
+ * TCP会话
+ */
 public class TCPSession extends Session {
 
     private SelectionKey key = null;
@@ -88,6 +91,10 @@ public class TCPSession extends Session {
         SessionManager.getSessionManager().unregisterSession(this);
     }
 
+    /**
+     * 读取流
+     * @throws IOException
+     */
     protected void read() throws IOException {
         int ret = readChannel();
 
@@ -105,6 +112,10 @@ public class TCPSession extends Session {
         }
     }
 
+    /**
+     * 读取输入流
+     * @throws IOException
+     */
     public void readRequest() throws IOException {
         Request request = null;
         IoBuffer tempBuffer = null;
@@ -140,6 +151,10 @@ public class TCPSession extends Session {
         }
     }
 
+    /**
+     * 客户端读取响应流
+     * @throws IOException
+     */
     public void readResponse() throws IOException {
         Response response = null;
         IoBuffer tempBuffer = null;

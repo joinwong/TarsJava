@@ -21,12 +21,16 @@ import java.io.IOException;
 import com.qq.tars.net.client.ticket.Ticket;
 import com.qq.tars.net.protocol.ProtocolException;
 
+/**
+ * Response 响应
+ */
 public abstract class Response {
 
     private int ticketNum = Ticket.DEFAULT_TICKET_NUMBER;
 
     protected transient Session session = null;
 
+    //是否异步调用
     protected transient boolean asyncMode = false;
 
     private volatile boolean commited = false;

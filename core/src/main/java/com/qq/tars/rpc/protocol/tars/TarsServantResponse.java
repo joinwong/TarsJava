@@ -52,6 +52,10 @@ public class TarsServantResponse extends ServantResponse implements java.io.Seri
         super(session);
     }
 
+    /**
+     * 解析responseBody
+     * @throws ProtocolException
+     */
     public void init() throws ProtocolException {
         if (inputStream == null) {
             return;

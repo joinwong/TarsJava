@@ -23,6 +23,9 @@ import java.util.concurrent.atomic.AtomicInteger;
 import com.qq.tars.net.client.ticket.Ticket;
 import com.qq.tars.net.protocol.ProtocolException;
 
+/**
+ * Request 请求
+ */
 public abstract class Request {
 
     private int ticketNum = Ticket.DEFAULT_TICKET_NUMBER;
@@ -31,12 +34,16 @@ public abstract class Request {
 
     protected transient Session session = null;
 
+    //调用方式
     protected transient InvokeStatus status = null;
 
+    //分布式
     private transient HashMap<String, String> distributedContext = new HashMap<String, String>(8);
 
+    //请求开始时间
     private transient long bornTime;
 
+    //请求执行时间
     private transient long processTime;
 
     public static enum InvokeStatus {

@@ -27,14 +27,19 @@ import java.util.concurrent.LinkedBlockingQueue;
 
 import com.qq.tars.net.core.Session;
 
+/**
+ * 反应堆线程
+ */
 public final class Reactor extends Thread {
 
     protected volatile Selector selector = null;
 
     private volatile boolean crashed = false;
 
+    //注册队列
     private final Queue<Object[]> register = new LinkedBlockingQueue<Object[]>();
 
+    //取消注册队列
     private final Queue<Session> unregister = new LinkedBlockingQueue<Session>();
 
     private Acceptor acceptor = null;
@@ -52,6 +57,7 @@ public final class Reactor extends Thread {
             this.acceptor = new TCPAcceptor(selectorManager);
         }
 
+        //打开选择器
         this.selector = Selector.open();
     }
 
@@ -71,6 +77,7 @@ public final class Reactor extends Thread {
         }
 
         if (Thread.currentThread() == this) {
+            //当前线程
             SelectionKey key = channel.register(this.selector, ops, attachment);
 
             if (attachment instanceof TCPSession) {
@@ -174,6 +181,11 @@ public final class Reactor extends Thread {
         }
     }
 
+    /**
+     * JavaNIO 分发事件
+     * @param key
+     * @throws IOException
+     */
     private void dispatchEvent(final SelectionKey key) throws IOException {
         if (key.isConnectable()) {
             acceptor.handleConnectEvent(key);

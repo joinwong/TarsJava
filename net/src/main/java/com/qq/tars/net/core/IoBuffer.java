@@ -18,6 +18,9 @@ package com.qq.tars.net.core;
 
 import java.nio.ByteBuffer;
 
+/**
+ * ByteBuffer包装
+ */
 public final class IoBuffer {
 
     private ByteBuffer buf = null;
@@ -149,6 +152,12 @@ public final class IoBuffer {
         return this.buf;
     }
 
+    /**
+     * 自动扩增
+     * @param size
+     * @param offset
+     * @param length
+     */
     private void autoExpand(int size, int offset, int length) {
         int newCapacity = this.buf.capacity();
         int newSize = this.buf.position() + length;

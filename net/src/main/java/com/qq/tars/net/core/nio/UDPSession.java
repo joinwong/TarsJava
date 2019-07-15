@@ -32,6 +32,9 @@ import com.qq.tars.net.protocol.ProtocolEncoder;
 import com.qq.tars.net.protocol.ProtocolException;
 import com.qq.tars.net.protocol.ProtocolFactory;
 
+/**
+ * UDP会话
+ */
 public class UDPSession extends Session {
 
     private int bufferSize = 1024 * 4;

@@ -25,6 +25,9 @@ import com.qq.tars.net.core.SessionManager;
 import com.qq.tars.net.core.Session.SessionStatus;
 import com.qq.tars.net.util.Utils;
 
+/**
+ * TCP接收器
+ */
 public class TCPAcceptor extends Acceptor {
 
     public TCPAcceptor(SelectorManager selectorManager) {
@@ -71,12 +74,22 @@ public class TCPAcceptor extends Acceptor {
         selectorManager.nextReactor().registerChannel(channel, SelectionKey.OP_READ, session);
     }
 
+    /**
+     * 读事件
+     * @param key
+     * @throws IOException
+     */
     public void handleReadEvent(SelectionKey key) throws IOException {
         TCPSession session = (TCPSession) key.attachment();
         if (session == null) throw new RuntimeException("The session is null when reading data...");
         session.read();
     }
 
+    /**
+     * 写事件
+     * @param key
+     * @throws IOException
+     */
     public void handleWriteEvent(SelectionKey key) throws IOException {
         TCPSession session = (TCPSession) key.attachment();
         if (session == null) throw new RuntimeException("The session is null when writing data...");
