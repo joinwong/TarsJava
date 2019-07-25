@@ -25,6 +25,9 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.ConcurrentHashMap;
 
+/**
+ * 注册和管理 TarsMethodInfo
+ */
 public final class AnalystManager {
 
     private final static AnalystManager instance = new AnalystManager();

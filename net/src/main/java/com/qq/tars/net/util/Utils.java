@@ -35,6 +35,11 @@ public class Utils {
         return processors > 8 ? 4 + (processors * 5 / 8) : processors + 1;
     }
 
+    public static void main(String... args) {
+        int i = Runtime.getRuntime().availableProcessors();
+        System.out.println(i);
+    }
+
     public static String getLocalIp() {
         try {
             Pattern pattern = Pattern.compile("(172|10)\\.[0-9]+\\.[0-9]+\\.[0-9]+");

@@ -110,6 +110,7 @@ public class BasicClassTypeUtil {
         Object last2 = null;
         Object returnObject = null;
         for (String name : list) {
+            //创建默认值
             returnObject = createClassByName(name);
 
             if (returnObject instanceof String) {
@@ -159,6 +160,12 @@ public class BasicClassTypeUtil {
         return returnObject;
     }
 
+    /**
+     * 创建默认值
+     * @param name
+     * @return
+     * @throws ObjectCreateException
+     */
     public static Object createClassByName(String name) throws ObjectCreateException {
         if (name.equals("java.lang.Integer")) {
             return 0;

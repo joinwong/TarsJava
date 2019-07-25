@@ -35,6 +35,9 @@ import com.qq.tars.support.stat.InvokeStatHelper;
 
 import java.util.List;
 
+/**
+ * TarsCallback 包装器. 调用TarsCallbackFilterChain
+ */
 public class TarsCallbackWrapper implements Callback<TarsServantResponse> {
 
     private final String objName;

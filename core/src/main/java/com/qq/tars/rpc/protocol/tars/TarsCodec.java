@@ -42,6 +42,9 @@ import java.lang.reflect.Method;
 import java.nio.ByteBuffer;
 import java.util.*;
 
+/**
+ * Tars 框架编解码
+ */
 public class TarsCodec extends Codec {
 
     public TarsCodec(String charsetName) {
@@ -62,6 +65,7 @@ public class TarsCodec extends Codec {
             jos.write(response.getPacketType(), 2);
 
             if (response.getVersion() == TarsHelper.VERSION) {
+                //TarsJava仍然是1.0
                 jos.write(response.getRequestId(), 3);
                 jos.write(response.getMessageType(), 4);
                 jos.write(response.getRet(), 5);
@@ -107,7 +111,7 @@ public class TarsCodec extends Codec {
     }
 
     /**
-     * 这里是1.0版本，已经废弃
+     * 这里是1.0版本，TarsJava使用
      *
      * @param response
      * @param charsetName
@@ -584,12 +588,15 @@ public class TarsCodec extends Codec {
         List<Object> list = new ArrayList<Object>();
         TarsMethodParameterInfo returnInfo = methodInfo.getReturnInfo();
         if (returnInfo != null && Void.TYPE != returnInfo.getType()) {
+            //非Void返回，第一个返回值必须是callback
             list.add(jis.read(returnInfo.getStamp(), returnInfo.getOrder(), true));
         }
 
         List<TarsMethodParameterInfo> parameterInfoList = methodInfo.getParametersList();
         for (TarsMethodParameterInfo info : parameterInfoList) {
-            if (TarsHelper.isContext(info.getAnnotations()) || TarsHelper.isCallback(info.getAnnotations())) {
+            if (TarsHelper.isContext(info.getAnnotations())
+                    || TarsHelper.isCallback(info.getAnnotations())) {
+                //参数列表排除Context 和 Callback
                 continue;
             }
 

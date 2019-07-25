@@ -26,6 +26,9 @@ import com.qq.tars.rpc.protocol.tars.TarsCodecHelper;
 import com.qq.tars.rpc.protocol.tars.TarsServantRequest;
 import com.qq.tars.rpc.protocol.tars.TarsServantResponse;
 
+/**
+ * TarsCallback
+ */
 @TarsCallback(comment = "Callback")
 public abstract class TarsAbstractCallback implements com.qq.tars.net.client.Callback<TarsServantResponse> {
 

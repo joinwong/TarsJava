@@ -33,9 +33,11 @@ import com.qq.tars.protocol.util.TarsUtil;
 
 class OldUniAttribute {
 
+    //存放输入字节
     protected HashMap<String, HashMap<String, byte[]>> _data = new HashMap<String, HashMap<String, byte[]>>();
 
     protected HashMap<String, Object> cachedClassName = new HashMap<String, Object>();
+    //存放读取对象
     private HashMap<String, Object> cachedData = new HashMap<String, Object>();
 
     protected String encodeName = "UTF-8";

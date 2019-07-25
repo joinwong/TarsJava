@@ -25,6 +25,12 @@ public abstract class AbstractFilterChain<T> implements FilterChain {
 		this.target = target;
 	}
 
+	/**
+	 * 过滤器执行
+	 * @param request
+	 * @param response
+	 * @throws Throwable
+	 */
 	@Override
 	public void doFilter(Request request, Response response) throws Throwable {
 		Filter filter = getFilter();

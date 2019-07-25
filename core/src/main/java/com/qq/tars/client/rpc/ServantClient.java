@@ -67,6 +67,10 @@ public class ServantClient {
         this.selectorManager = selectorManager;
     }
 
+    /**
+     * 连接服务端
+     * @throws IOException
+     */
     protected synchronized void reConnect() throws IOException {
         if (isNotConnected()) {
             SocketAddress server = new InetSocketAddress(this.host, this.port);

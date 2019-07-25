@@ -14,6 +14,9 @@ import com.qq.tars.rpc.exc.TarsException;
 import com.qq.tars.rpc.protocol.tars.TarsServantRequest;
 import com.qq.tars.rpc.protocol.tars.TarsServantResponse;
 
+/**
+ * TarsCallback Filter Chain
+ */
 public class TarsCallbackFilterChain extends AbstractFilterChain<Callback<TarsServantResponse>> {
 	
 	private int expireFlag;
@@ -24,6 +27,12 @@ public class TarsCallbackFilterChain extends AbstractFilterChain<Callback<TarsSe
 		this.expireFlag = expireFlag;
 	}
 
+	/**
+	 * 真实的异步invoke
+	 * @param request
+	 * @param response
+	 * @throws Throwable
+	 */
 	@Override
 	protected void doRealInvoke(Request request, Response response)
 			throws Throwable {

@@ -54,6 +54,10 @@ public class TarsInvoker<T> extends ServantInvoker<T> {
 
     public TarsInvoker(ServantProxyConfig config, Class<T> api, Url url, ServantClient[] clients) {
         super(config, api, url, clients);
+
+        //TraceServerFilter
+        //TraceClientFilter
+        //TraceCallbackFilter
         filters = AppContextManager.getInstance().getAppContext() == null ? null : AppContextManager.getInstance().getAppContext().getFilters(FilterKind.CLIENT);
     }
 

@@ -165,6 +165,7 @@ public final class ObjectProxy<T> implements ServantProxy, InvocationHandler {
             this.queryRefreshFuture.cancel(false);
         }
         if (!servantProxyConfig.isDirectConnection()) {
+            //非直连
             int interval = servantProxyConfig.getRefreshInterval();
             int initialDelay = interval + (random.nextInt(30) * 1000);
             this.queryRefreshFuture = ScheduledExecutorManager.getInstance().scheduleAtFixedRate(new ServantNodeRefresher(), initialDelay, interval, TimeUnit.MILLISECONDS);

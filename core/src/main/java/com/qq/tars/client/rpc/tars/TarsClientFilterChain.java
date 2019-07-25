@@ -15,6 +15,9 @@ import com.qq.tars.rpc.protocol.ServantRequest;
 import com.qq.tars.rpc.protocol.tars.TarsServantRequest;
 import com.qq.tars.rpc.protocol.tars.TarsServantResponse;
 
+/**
+ * TarsClient Filter Chain
+ */
 public class TarsClientFilterChain extends AbstractFilterChain<ServantClient> {
 	
 	private int type;
@@ -30,17 +33,24 @@ public class TarsClientFilterChain extends AbstractFilterChain<ServantClient> {
 		this.callback = callback;
 	}
 	
-	
 	public Future<TarsServantResponse> getFuture() {
 		return future;
 	}
 
+	/**
+	 * 真实的invoke
+	 * @param request
+	 * @param response
+	 * @throws Throwable
+	 */
 	@Override
 	protected void doRealInvoke(Request request, Response response) throws Throwable {
 		if (request instanceof TarsServantRequest && target != null) {
 			TarsServantResponse tarsServantResponse = (TarsServantResponse)response;
 			if (type == 0) {
+				//同步调用
 				try {
+					//调用servantClient
 					TarsServantResponse result = target.invokeWithSync((ServantRequest) request);
 					BeanAccessor.setBeanValue(tarsServantResponse, "cause", result.getCause());
 					BeanAccessor.setBeanValue(tarsServantResponse, "result", result.getResult());
@@ -52,10 +62,12 @@ public class TarsClientFilterChain extends AbstractFilterChain<ServantClient> {
 				return;
 			}
 			if (type == 1) {
+				//异步调用
 				target.invokeWithAsync((ServantRequest)request, callback);
 				return;
 			}
 			if (type == 2) {
+				//Future调用
 				future = target.invokeWithFuture((ServantRequest) request);
 			}
 		}
