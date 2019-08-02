@@ -25,19 +25,31 @@ import com.qq.tars.server.core.Server;
 import java.io.File;
 import java.net.URL;
 
+/**
+ * 老的启动方式：只能使用xml配置
+ */
 public class Main {
 
     public static void main(String[] args) throws Exception {
+        //初始化服务器配置
         Server.loadServerConfig();
+
+        //初始化communicator
         Server.initCommunicator();
+
+        //配置日志信息
         Server.configLogger();
+
+        //服务性能/心跳/属性上报
         Server.startManagerService();
 
         AppContext context = null;
         URL servantXML = Main.class.getClassLoader().getResource("servants.xml");
         if (servantXML != null) {
+            //xml配置方式
             context = new XmlAppContext();
         } else if (Main.class.getClassLoader().getResource("servants-spring.xml") != null){
+            //spring方式
             System.out.println("[SERVER] find servants-spring.xml, use Spring mode.");
             Class clazz = Class.forName("com.qq.tars.server.apps.SpringAppContext");
             context = (AppContext) clazz.newInstance();

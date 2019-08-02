@@ -37,17 +37,22 @@ import java.util.concurrent.atomic.AtomicBoolean;
 import java.util.concurrent.locks.ReentrantLock;
 
 /**
- * 通讯器
+ * 客户端通讯器
  */
 public final class Communicator {
 
     private volatile String id;
+    //配置文件解析
     private volatile CommunicatorConfig communicatorConfig;
     private volatile ThreadPoolExecutor threadPoolExecutor;
+    //servant代理工厂
     private final ServantProxyFactory servantProxyFactory = new ServantProxyFactory(this);
+    //对象代理工厂
     private final ObjectProxyFactory objectProxyFactory = new ObjectProxyFactory(this);
 
+    //查询Node
     private final QueryHelper queryHelper = new QueryHelper(this);
+    //上报调用
     private final StatHelper statHelper = new StatHelper(this);
 
     private final ReentrantLock lock = new ReentrantLock();
@@ -100,6 +105,11 @@ public final class Communicator {
         }
     }
 
+    /**
+     * 初始化通讯器
+     * @param config
+     * @throws CommunicatorConfigException
+     */
     private void initCommunicator(CommunicatorConfig config) throws CommunicatorConfigException {
         if (inited.get()) {
             return;
@@ -108,14 +118,19 @@ public final class Communicator {
         try {
             if (!inited.get()) {
                 try {
+                    //初始化客户端日志
                     ClientLogger.init(config.getLogPath(), config.getLogLevel());
+
+                    //客户端locator
                     if (StringUtils.isEmpty(config.getLocator())) {
                         this.id = UUID.randomUUID().toString().replaceAll("-", "");
                     } else {
                         this.id = UUID.nameUUIDFromBytes(config.getLocator().getBytes()).toString().replaceAll("-", "");
                     }
                     this.communicatorConfig = config;
+                    //初始化线程池
                     this.threadPoolExecutor = ClientPoolManager.getClientThreadPoolExecutor(config);
+                    //标记该通讯器已经初始化
                     inited.set(true);
                 } catch (Throwable e) {
                     inited.set(false);

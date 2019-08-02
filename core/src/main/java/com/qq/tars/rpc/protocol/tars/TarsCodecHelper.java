@@ -42,6 +42,7 @@ import com.qq.tars.protocol.util.TarsUtil;
 import com.qq.tars.rpc.protocol.tars.support.AnalystManager;
 import com.qq.tars.rpc.protocol.tup.UniAttribute;
 
+@Deprecated
 @SuppressWarnings("unchecked")
 public class TarsCodecHelper {
 

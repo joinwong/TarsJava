@@ -30,11 +30,19 @@ import com.qq.tars.common.util.concurrent.TaskThreadPoolExecutor;
 import com.qq.tars.net.core.nio.SelectorManager;
 import com.qq.tars.net.protocol.ProtocolFactory;
 
+/**
+ * 客户端线程池管理
+ */
 public class ClientPoolManager {
 
     private final static ConcurrentHashMap<CommunicatorConfig, ThreadPoolExecutor> clientThreadPoolMap = new ConcurrentHashMap<CommunicatorConfig, ThreadPoolExecutor>();
     private final static ConcurrentHashMap<ServantProxyConfig, SelectorManager> selectorsMap = new ConcurrentHashMap<ServantProxyConfig, SelectorManager>();
 
+    /**
+     * 获取线程池执行器
+     * @param communicatorConfig
+     * @return
+     */
     public static ThreadPoolExecutor getClientThreadPoolExecutor(CommunicatorConfig communicatorConfig) {
         ThreadPoolExecutor clientPoolExecutor = clientThreadPoolMap.get(communicatorConfig);
         if (clientPoolExecutor == null) {
@@ -49,10 +57,19 @@ public class ClientPoolManager {
         return clientPoolExecutor;
     }
 
+    /**
+     * 创建线程池
+     * @param communicatorConfig
+     * @return
+     */
     private static ThreadPoolExecutor createThreadPool(CommunicatorConfig communicatorConfig) {
+        //默认服务器核数
         int corePoolSize = communicatorConfig.getCorePoolSize();
+        //默认服务器核数*2
         int maxPoolSize = communicatorConfig.getMaxPoolSize();
+        //默认120
         int keepAliveTime = communicatorConfig.getKeepAliveTime();
+        //默认20000
         int queueSize = communicatorConfig.getQueueSize();
         TaskQueue taskqueue = new TaskQueue(queueSize);
 

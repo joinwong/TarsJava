@@ -39,6 +39,10 @@ public class XmlAppContext extends BaseAppContext {
     public XmlAppContext() {
     }
 
+    /**
+     * 加载servants
+     * @throws Exception
+     */
     @Override
     protected void loadServants() throws Exception {
         XMLConfigFile cfg = new XMLConfigFile();
@@ -46,12 +50,16 @@ public class XmlAppContext extends BaseAppContext {
         XMLConfigElement root = cfg.getRootElement();
         ArrayList<XMLConfigElement> elements = root.getChildList();
 
+        //加载初始化params
         loadInitParams(root.getChildListByName("context-param"));
 
+        //加载listener
         loadAppContextListeners(elements);
 
+        //加载appservant
         loadAppServants(elements);
-        
+
+        //记载filter
         loadDefaultFilter();
         
         loadAppFilters(elements);

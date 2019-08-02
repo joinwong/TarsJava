@@ -38,6 +38,17 @@ class ServantProxyFactory {
         this.communicator = communicator;
     }
 
+    /**
+     * 获取servant代理
+     * @param clazz
+     * @param objName
+     * @param setDivision
+     * @param servantProxyConfig
+     * @param loadBalance
+     * @param protocolInvoker
+     * @param <T>
+     * @return
+     */
     public <T> Object getServantProxy(Class<T> clazz, String objName, String setDivision, ServantProxyConfig servantProxyConfig,
                                       LoadBalance loadBalance, ProtocolInvoker<T> protocolInvoker) {
         String key = setDivision != null ? clazz.getSimpleName() + objName + setDivision : clazz.getSimpleName() + objName;
@@ -47,7 +58,10 @@ class ServantProxyFactory {
             try {
                 proxy = cache.get(key);
                 if (proxy == null) {
+                    //拿到对象代理，原生拦截器
                     ObjectProxy<T> objectProxy = communicator.getObjectProxyFactory().getObjectProxy(clazz, objName, setDivision, servantProxyConfig, loadBalance, protocolInvoker);
+
+                    //创建代理并缓存
                     cache.putIfAbsent(key, createProxy(clazz, objectProxy));
                     proxy = cache.get(key);
                 }

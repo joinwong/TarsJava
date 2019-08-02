@@ -35,6 +35,9 @@ import com.qq.tars.rpc.protocol.tars.TarsCodec;
 
 import java.lang.reflect.Constructor;
 
+/**
+ * 对象代理工厂
+ */
 class ObjectProxyFactory {
 
     private final Communicator communicator;
@@ -43,14 +46,28 @@ class ObjectProxyFactory {
         this.communicator = communicator;
     }
 
+    /**
+     * 拿到servant对象代理
+     * @param api
+     * @param objName
+     * @param setDivision
+     * @param servantProxyConfig
+     * @param loadBalance
+     * @param protocolInvoker
+     * @param <T>
+     * @return
+     * @throws ClientException
+     */
     public <T> ObjectProxy<T> getObjectProxy(Class<T> api, String objName, String setDivision, ServantProxyConfig servantProxyConfig,
                                              LoadBalance<T> loadBalance, ProtocolInvoker<T> protocolInvoker) throws ClientException {
         if (servantProxyConfig == null) {
             //创建默认的servantProxy
             servantProxyConfig = createServantProxyConfig(objName, setDivision);
         } else {
+            //已经配置过
             servantProxyConfig.setCommunicatorId(communicator.getId());
             servantProxyConfig.setModuleName(communicator.getCommunicatorConfig().getModuleName(), communicator.getCommunicatorConfig().isEnableSet(), communicator.getCommunicatorConfig().getSetDivision());
+            //这里配置locator，如果设置过则使用自己配置的，否则使用默认值
             servantProxyConfig.setLocator(communicator.getCommunicatorConfig().getLocator());
             if (StringUtils.isNotEmpty(setDivision)) {
                 //分区
@@ -63,24 +80,41 @@ class ObjectProxyFactory {
 
         //负载均衡器
         if (loadBalance == null) {
+            //初始化默认负载均衡
             loadBalance = createLoadBalance(servantProxyConfig);
         }
 
         if (protocolInvoker == null) {
+            //初始化protocolInvoker
             protocolInvoker = createProtocolInvoker(api, servantProxyConfig);
         }
+
+        //对象代理
         return new ObjectProxy<T>(api, servantProxyConfig, loadBalance, protocolInvoker, communicator);
     }
 
+    /**
+     * 创建protocolInvoker
+     * @param api
+     * @param servantProxyConfig
+     * @param <T>
+     * @return
+     * @throws ClientException
+     */
     private <T> ProtocolInvoker<T> createProtocolInvoker(Class<T> api,
                                                          ServantProxyConfig servantProxyConfig) throws ClientException {
         ProtocolInvoker<T> protocolInvoker = null;
+        //创建TarsCodec
         Codec codec = createCodec(api, servantProxyConfig);
         if (api.isAnnotationPresent(Servant.class)) {
             if (codec == null) {
+                //默认TarsCodec
                 codec = new TarsCodec(servantProxyConfig.getCharsetName());
             }
+            //protobuff or tars
             servantProxyConfig.setProtocol(codec.getProtocol());
+
+            //创建TarsProtocolInvoker
             protocolInvoker = new TarsProtocolInvoker<T>(api, servantProxyConfig, new ServantProtocolFactory(codec), communicator.getThreadPoolExecutor());
         } else {
             throw new ClientException(servantProxyConfig.getSimpleObjectName(), "unkonw protocol servant invoker", null);
@@ -144,6 +178,7 @@ class ObjectProxyFactory {
                     endpoints = ParseTools.parse(RegisterManager.getInstance().getHandler().query(cfg.getSimpleObjectName()),
                             cfg.getSimpleObjectName());
                 } else {
+                    //拿到服务端node
                     endpoints = communicator.getQueryHelper().getServerNodes(cfg);
                 }
                 if (StringUtils.isEmpty(endpoints)) {

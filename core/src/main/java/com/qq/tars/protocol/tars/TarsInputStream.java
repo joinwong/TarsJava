@@ -30,6 +30,9 @@ import java.util.Map;
 import com.qq.tars.common.util.HexUtil;
 import com.qq.tars.protocol.tars.exc.TarsDecodeException;
 
+/**
+ * 输出流
+ */
 public final class TarsInputStream {
 
     private ByteBuffer bs; // 缓冲区

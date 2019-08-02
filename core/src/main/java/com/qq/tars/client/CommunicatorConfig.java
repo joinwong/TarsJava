@@ -73,6 +73,11 @@ public class CommunicatorConfig {
         return new CommunicatorConfig();
     }
 
+    /**
+     * 解析client配置
+     * @param conf
+     * @return
+     */
     public CommunicatorConfig load(Config conf) {
         locator = conf.get("/tars/application/client<locator>");
         logPath = conf.get("/tars/application/client<logpath>", null);

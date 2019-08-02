@@ -16,6 +16,9 @@
 
 package com.qq.tars.protocol.tars;
 
+/**
+ * Tars 支持的14个类型
+ */
 @SuppressWarnings("serial")
 public abstract class TarsStructBase implements java.io.Serializable {
 

@@ -19,6 +19,9 @@ package com.qq.tars.client.util;
 import com.qq.tars.support.log.Logger;
 import com.qq.tars.support.log.LoggerFactory;
 
+/**
+ * 客户端日志
+ */
 public final class ClientLogger {
 
     private static final String CLIENT_LOG_NAME = "tars_client.log";

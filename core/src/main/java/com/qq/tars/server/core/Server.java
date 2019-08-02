@@ -109,6 +109,7 @@ public class Server {
 
     public static void loadServerConfig() {
         try {
+            //解决TAF配置文件,初始化服务器配置
             ConfigurationManager.getInstance().init();
 
             ServerConfig cfg = ConfigurationManager.getInstance().getServerConfig();

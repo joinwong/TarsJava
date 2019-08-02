@@ -113,7 +113,7 @@ public class TCPSession extends Session {
     }
 
     /**
-     * 读取输入流
+     * 读取请求流
      * @throws IOException
      */
     public void readRequest() throws IOException {
@@ -228,6 +228,11 @@ public class TCPSession extends Session {
     public void accept() throws IOException {
     }
 
+    /**
+     * 写入流
+     * @param buffer
+     * @throws IOException
+     */
     protected void write(IoBuffer buffer) throws IOException {
         if (buffer == null) return;
 
@@ -243,6 +248,11 @@ public class TCPSession extends Session {
         }
     }
 
+    /**
+     * TCP Session真实的写请求
+     * @return
+     * @throws IOException
+     */
     protected synchronized int doWrite() throws IOException {
         int writeBytes = 0;
 

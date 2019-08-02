@@ -27,6 +27,9 @@ import java.util.HashMap;
 import java.util.Map.Entry;
 import java.util.concurrent.atomic.AtomicInteger;
 
+/**
+ * 上报帮助类
+ */
 public final class StatHelper {
 
     private final static int BATCH_REPORTS = 10;
@@ -46,6 +49,11 @@ public final class StatHelper {
         return prx;
     }
 
+    /**
+     * 特性上报
+     * @param proxyStat
+     * @param bFromClient
+     */
     public void report(ProxyStat proxyStat, boolean bFromClient) {
         StatFPrx statFProxy = getPrx();
         if (statFProxy == null) {
@@ -82,6 +90,7 @@ public final class StatHelper {
                         mbody.count + "_" + mbody.execCount + "_" + mbody.timeoutCount + "_" + mbody.totalRspTime + "_" + mbody.maxRspTime + "_" + mbody.minRspTime);
                 i++;
                 if (i % BATCH_REPORTS == 0) {
+                    //10条上报一次
                     try {
                         statFProxy.reportMicMsg(reprotMap, bFromClient);
                         ++successCount;

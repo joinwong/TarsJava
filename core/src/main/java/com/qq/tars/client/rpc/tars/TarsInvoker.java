@@ -48,6 +48,10 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+/**
+ * TarsInvoker 目前只实现了同步和异步，没有实现future
+ * @param <T>
+ */
 public class TarsInvoker<T> extends ServantInvoker<T> {
 
     List<Filter> filters;
@@ -66,6 +70,12 @@ public class TarsInvoker<T> extends ServantInvoker<T> {
         super.setAvailable(available);
     }
 
+    /**
+     * client真实的请求转发
+     * @param inv
+     * @return
+     * @throws Throwable
+     */
     protected Object doInvokeServant(final ServantInvokeContext inv) throws Throwable {
         long begin = System.currentTimeMillis();
 
@@ -95,8 +105,9 @@ public class TarsInvoker<T> extends ServantInvoker<T> {
             throw e;
         } finally {
             if (!isAsync) {
+                //每次调用结束检查servernode是否可用
                 setAvailable(ServantnvokerAliveChecker.isAlive(getUrl(), config, ret));
-                //每次客户端调用上报
+                //每次客户端调用结束 统计数据
                 InvokeStatHelper.getInstance().addProxyStat(objName).addInvokeTimeByClient(config.getMasterName(), config.getSlaveName(), config.getSlaveSetName(), config.getSlaveSetArea(), config.getSlaveSetID(), inv.getMethodName(), getUrl().getHost(), getUrl().getPort(), ret, System.currentTimeMillis() - begin);
             }
         }
@@ -107,7 +118,7 @@ public class TarsInvoker<T> extends ServantInvoker<T> {
     }
 
     /**
-     * 真实的包
+     * 客户端同步调用请求
      * @param method
      * @param args
      * @param context
@@ -116,6 +127,7 @@ public class TarsInvoker<T> extends ServantInvoker<T> {
      */
     private TarsServantResponse invokeWithSync(Method method, Object args[], Map<String, String> context) throws Throwable {
         ServantClient client = getClient();
+        //输入参数
         TarsServantRequest request = new TarsServantRequest(client.getIoSession());
         request.setVersion(TarsHelper.VERSION);
         request.setMessageType(isHashInvoke(context) ? TarsHelper.MESSAGETYPEHASH : TarsHelper.MESSAGETYPENULL);
@@ -128,6 +140,7 @@ public class TarsInvoker<T> extends ServantInvoker<T> {
         request.setContext(context);
         request.setInvokeStatus(InvokeStatus.SYNC_CALL);
 
+        //输出参数
         TarsServantResponse response = new TarsServantResponse(request.getIoSession());
         response.setRequest(request);
         response.setRequestId(request.getTicketNumber());
@@ -140,9 +153,11 @@ public class TarsInvoker<T> extends ServantInvoker<T> {
         response.setTimeout(request.getTimeout());
         response.setContext(request.getContext());
 
+        //分布式上下文
         DistributedContext distributedContext = DistributedContextManager.getDistributedContext();
+        //是否开启染色
         Boolean bDyeing = distributedContext.get(DyeingSwitch.BDYEING);
-        if (bDyeing != null && bDyeing == true) {
+        if (bDyeing != null && bDyeing) {
             request.setMessageType(request.getMessageType() | TarsHelper.MESSAGETYPEDYED);
             HashMap<String, String> status = new HashMap<String, String>();
             String routeKey = distributedContext.get(DyeingSwitch.DYEINGKEY);
@@ -152,11 +167,20 @@ public class TarsInvoker<T> extends ServantInvoker<T> {
             request.setStatus(status);
 
         }
+
+        //执行调用链
         FilterChain filterChain = new TarsClientFilterChain(filters, objName, FilterKind.CLIENT, client, 0, null);
         filterChain.doFilter(request, response);
         return response;
     }
 
+    /**
+     * 客户端异步调用
+     * @param method
+     * @param args
+     * @param context
+     * @throws Throwable
+     */
     @SuppressWarnings("unchecked")
     private void invokeWithAsync(Method method, Object args[], Map<String, String> context) throws Throwable {
         ServantClient client = getClient();

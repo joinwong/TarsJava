@@ -103,6 +103,10 @@ public class RoundRobinLoadBalance<T> implements LoadBalance<T> {
         return invoker;
     }
 
+    /**
+     * 刷新invokers
+     * @param invokers
+     */
     @Override
     public void refresh(Collection<Invoker<T>> invokers) {
         ClientLogger.getLogger().info(config.getSimpleObjectName() + " try to refresh RoundRobinLoadBalance's invoker cache, size=" + (invokers == null || invokers.isEmpty() ? 0 : invokers.size()));

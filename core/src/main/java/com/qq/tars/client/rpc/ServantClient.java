@@ -145,12 +145,13 @@ public class ServantClient {
         Ticket<T> ticket = null;
         T response = null;
         try {
+            //确认服务端连接是否正常
             ensureConnected();
             request.setInvokeStatus(InvokeStatus.SYNC_CALL);
             ticket = TicketManager.createTicket(request, session, this.syncTimeout);
 
             Session current = session;
-            //发送请求
+            //发送IO请求
             current.write(request);
             //判断是否超时
             if (!ticket.await(this.syncTimeout, TimeUnit.MILLISECONDS)) {

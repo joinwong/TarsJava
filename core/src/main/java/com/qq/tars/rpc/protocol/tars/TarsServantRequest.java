@@ -24,6 +24,9 @@ import com.qq.tars.rpc.protocol.ServantRequest;
 
 import java.util.Map;
 
+/**
+ * 真实的TarsServant请求
+ */
 public class TarsServantRequest extends ServantRequest implements java.io.Serializable {
 
     private static final long serialVersionUID = 1L;
@@ -56,6 +59,9 @@ public class TarsServantRequest extends ServantRequest implements java.io.Serial
         this.ret = ret;
     }
 
+    /**
+     * 解析请求流
+     */
     public void init() {
         ((TarsCodec) this.session.getProtocolFactory().getDecoder()).decodeRequestBody(this);
 //        TarsCodecHelper.decodeRequestBody(this);

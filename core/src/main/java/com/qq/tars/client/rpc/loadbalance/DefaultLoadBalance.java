@@ -26,6 +26,10 @@ import com.qq.tars.rpc.common.exc.NoInvokerException;
 
 import java.util.Collection;
 
+/**
+ * 默认负载均衡 : roundRobinLoadBalance
+ * @param <T>
+ */
 public class DefaultLoadBalance<T> implements LoadBalance<T> {
 
     private final RoundRobinLoadBalance<T> roundRobinLoadBalance;
@@ -78,6 +82,10 @@ public class DefaultLoadBalance<T> implements LoadBalance<T> {
         return roundRobinLoadBalance.select(invocation);
     }
 
+    /**
+     * ObjectProxy 拦截器中调用
+     * @param invokers
+     */
     @Override
     public void refresh(Collection<Invoker<T>> invokers) {
         lastRefreshInvokers = invokers;

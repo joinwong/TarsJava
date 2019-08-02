@@ -26,6 +26,9 @@ import com.qq.tars.protocol.tars.TarsInputStream;
 import com.qq.tars.rpc.protocol.Codec;
 import com.qq.tars.rpc.protocol.ServantResponse;
 
+/**
+ * 真实的TarsServant响应
+ */
 public class TarsServantResponse extends ServantResponse implements java.io.Serializable {
 
     private static final long serialVersionUID = 3163555867604946654L;

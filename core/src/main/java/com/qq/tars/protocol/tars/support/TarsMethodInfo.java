@@ -19,10 +19,16 @@ package com.qq.tars.protocol.tars.support;
 import java.lang.reflect.Method;
 import java.util.List;
 
+/**
+ * Tars method 方法信息
+ */
 public class TarsMethodInfo {
 
+    //method 信息
     private Method method;
+    //返回参数
     private TarsMethodParameterInfo returnInfo;
+    //入参列表
     private List<TarsMethodParameterInfo> parametersList;
 
     private String serviceName;

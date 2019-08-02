@@ -24,6 +24,9 @@ import com.qq.tars.client.ServantProxyConfig;
 import com.qq.tars.client.util.ClientLogger;
 import com.qq.tars.common.util.Constants;
 
+/**
+ * servantInvoker 存活检测
+ */
 public class ServantInvokerAliveStat {
 
     private final String identity;

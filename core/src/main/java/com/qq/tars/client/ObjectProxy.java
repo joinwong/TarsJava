@@ -34,6 +34,10 @@ import java.util.Random;
 import java.util.concurrent.ScheduledFuture;
 import java.util.concurrent.TimeUnit;
 
+/**
+ * Tars自己定义的拦截器
+ * @param <T>
+ */
 public final class ObjectProxy<T> implements ServantProxy, InvocationHandler {
 
     private final Class<T> api;
@@ -64,6 +68,14 @@ public final class ObjectProxy<T> implements ServantProxy, InvocationHandler {
         this.initialize();
     }
 
+    /**
+     * 远程invoker真实执行方法
+     * @param proxy
+     * @param method
+     * @param args
+     * @return
+     * @throws Throwable
+     */
     public Object invoke(Object proxy, Method method, Object[] args) throws Throwable {
         String methodName = method.getName();
         Class<?>[] parameterTypes = method.getParameterTypes();
@@ -90,7 +102,9 @@ public final class ObjectProxy<T> implements ServantProxy, InvocationHandler {
                 return null;
             }
 
+            //负载均衡器拿到 invoker
             Invoker invoker = loadBalancer.select(context);
+            //执行方法
             return invoker.invoke(context);
         } catch (Throwable e) {
             e.printStackTrace();
@@ -98,6 +112,7 @@ public final class ObjectProxy<T> implements ServantProxy, InvocationHandler {
                 ClientLogger.getLogger().debug(servantProxyConfig.getSimpleObjectName() + " error occurred on invoke|" + e.getLocalizedMessage(), e);
             }
             if (e instanceof NoInvokerException) {
+                //这里拦截异常，重新定义
                 throw new NoConnectionException(servantProxyConfig.getSimpleObjectName(), e.getLocalizedMessage(), e);
             }
             throw new ClientException(servantProxyConfig.getSimpleObjectName(), e.getLocalizedMessage(), e);
@@ -138,9 +153,11 @@ public final class ObjectProxy<T> implements ServantProxy, InvocationHandler {
     }
 
     private void initialize() {
+        //负载均衡初始化
         loadBalancer.refresh(protocolInvoker.getInvokers());
 
         if (StringUtils.isNotEmpty(this.servantProxyConfig.getLocator()) && !StringUtils.isEmpty(this.servantProxyConfig.getStat())) {
+            //注册客户端上报
             this.registryStatReproter();
         }
         if (!servantProxyConfig.isDirectConnection()) {
@@ -149,6 +166,9 @@ public final class ObjectProxy<T> implements ServantProxy, InvocationHandler {
         }
     }
 
+    /**
+     * 每隔30秒注册stat上报
+     */
     private void registryStatReproter() {
         if (this.statReportFuture != null && !this.statReportFuture.isCancelled()) {
             this.statReportFuture.cancel(false);
@@ -172,6 +192,9 @@ public final class ObjectProxy<T> implements ServantProxy, InvocationHandler {
         }
     }
 
+    /**
+     * 定时刷新servantNode
+     */
     private class ServantNodeRefresher implements Runnable {
 
         public void run() {
@@ -198,6 +221,9 @@ public final class ObjectProxy<T> implements ServantProxy, InvocationHandler {
         }
     }
 
+    /**
+     * Servant stat 上报
+     */
     private class ServantStatReproter implements Runnable {
 
         public void run() {

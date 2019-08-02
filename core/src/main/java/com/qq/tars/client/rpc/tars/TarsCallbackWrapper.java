@@ -68,6 +68,7 @@ public class TarsCallbackWrapper implements Callback<TarsServantResponse> {
 
     public void onCompleted(TarsServantResponse response) {
         int ret = response.getRet() == TarsHelper.SERVERSUCCESS ? Constants.INVOKE_STATUS_SUCC : Constants.INVOKE_STATUS_EXEC;
+        //
         boolean available = ServantnvokerAliveChecker.isAlive(invoker.getUrl(), config, ret);
         invoker.setAvailable(available);
         try {

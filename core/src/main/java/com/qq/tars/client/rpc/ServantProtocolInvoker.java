@@ -108,9 +108,13 @@ public abstract class ServantProtocolInvoker<T> implements ProtocolInvoker<T> {
         return client;
     }
 
+    /**
+     * 初始化invoker
+     */
     protected void initInvoker() {
         try {
             ClientLogger.getLogger().info("try to init invoker|conf=" + servantProxyConfig.toString());
+            //解析object初始化的时候拿到的servernode
             List<Url> list = ParseTools.parse(servantProxyConfig);
             for (Url url : list) {
                 try {

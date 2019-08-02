@@ -29,6 +29,9 @@ import com.qq.tars.protocol.util.TarsHelper;
 import com.qq.tars.support.query.prx.EndpointF;
 import com.qq.tars.support.query.prx.QueryFPrx;
 
+/**
+ * 查询帮助
+ */
 public final class QueryHelper {
 
     private final Communicator communicator;
@@ -46,6 +49,11 @@ public final class QueryHelper {
         return prx;
     }
 
+    /**
+     * 查询服务器Node，直连模式
+     * @param config
+     * @return
+     */
     public String getServerNodes(ServantProxyConfig config) {
         QueryFPrx queryProxy = getPrx();
         String name = config.getSimpleObjectName();

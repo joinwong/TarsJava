@@ -34,6 +34,7 @@ public class TaskThreadFactory implements ThreadFactory {
     }
 
 
+    //设置任务线程为非守护线程
     public Thread newThread(Runnable r) {
         TaskThread t = new TaskThread(group, r, namePrefix + threadNumber.getAndIncrement());
         if (t.isDaemon())

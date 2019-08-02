@@ -38,7 +38,7 @@ public class TarsClientFilterChain extends AbstractFilterChain<ServantClient> {
 	}
 
 	/**
-	 * 真实的invoke
+	 * 客户端真实的invoke
 	 * @param request
 	 * @param response
 	 * @throws Throwable
