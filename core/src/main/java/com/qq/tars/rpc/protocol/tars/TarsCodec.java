@@ -278,7 +278,7 @@ public class TarsCodec extends Codec {
     }
 
     /**
-     * decode 请求
+     * 解密请求参数
      * @param buffer
      * @param session
      * @return
@@ -332,6 +332,7 @@ public class TarsCodec extends Codec {
     public ServantRequest decodeRequestBody(ServantRequest req) {
         TarsServantRequest request = (TarsServantRequest) req;
         if (request.getRet() != TarsHelper.SERVERSUCCESS) {
+            //SERVERCODEERR
             return request;
         }
         if (TarsHelper.isPing(request.getFunctionName())) {

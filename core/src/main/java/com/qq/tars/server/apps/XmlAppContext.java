@@ -40,7 +40,7 @@ public class XmlAppContext extends BaseAppContext {
     }
 
     /**
-     * 加载servants
+     * xml加载servants
      * @throws Exception
      */
     @Override
@@ -50,16 +50,16 @@ public class XmlAppContext extends BaseAppContext {
         XMLConfigElement root = cfg.getRootElement();
         ArrayList<XMLConfigElement> elements = root.getChildList();
 
-        //加载初始化params
+        //加载初始化上下文params
         loadInitParams(root.getChildListByName("context-param"));
 
         //加载listener
         loadAppContextListeners(elements);
 
-        //加载appservant
+        //加载appservant，并启动服务
         loadAppServants(elements);
 
-        //记载filter
+        //加载默认的filter，是否监听
         loadDefaultFilter();
         
         loadAppFilters(elements);
@@ -112,6 +112,15 @@ public class XmlAppContext extends BaseAppContext {
         }
     }
 
+    /**
+     * 加载servant
+     * @param element
+     * @return
+     * @throws ClassNotFoundException
+     * @throws InstantiationException
+     * @throws IllegalAccessException
+     * @throws IOException
+     */
     @SuppressWarnings("unchecked")
     private ServantHomeSkeleton loadServant(XMLConfigElement element) throws ClassNotFoundException, InstantiationException, IllegalAccessException, IOException {
         String homeName = null, homeApiName = null, homeClassName = null, processorClazzName = null,
@@ -125,14 +134,20 @@ public class XmlAppContext extends BaseAppContext {
 
         ServerConfig serverCfg = ConfigurationManager.getInstance().getServerConfig();
 
+        //获取配置的servant objName
         homeName = element.getStringAttribute("name");
         if (StringUtils.isEmpty(homeName)) {
             throw new RuntimeException("servant name is null.");
         }
+        //App.Server.ServantName
         homeName = String.format("%s.%s.%s", serverCfg.getApplication(), serverCfg.getServerName(), homeName);
+        //生成的servant
         homeApiName = getChildNodeValue(element, "home-api");
+        //servant的实现代码
         homeClassName = getChildNodeValue(element, "home-class");
+        //
         processorClazzName = getChildNodeValue(element, "home-processor-class");
+        //编码
         codecClazzName = getChildNodeValue(element, "home-codec-class");
 
         homeApiClazz = Class.forName(homeApiName);
@@ -140,6 +155,7 @@ public class XmlAppContext extends BaseAppContext {
         codecClazz = (Class<? extends Codec>) (StringUtils.isEmpty(codecClazzName) ? null : Class.forName(codecClazzName));
         processorClazz = (Class<? extends Processor>) (StringUtils.isEmpty(processorClazzName) ? null : Class.forName(processorClazzName));
 
+        //校验是否@servant
         if (TarsHelper.isServant(homeApiClazz)) {
             String servantName = homeApiClazz.getAnnotation(Servant.class).name();
             if (!StringUtils.isEmpty(servantName) && servantName.matches("^[\\w]+\\.[\\w]+\\.[\\w]+$")) {
@@ -147,11 +163,13 @@ public class XmlAppContext extends BaseAppContext {
             }
         }
 
+        //读取servantAdapter
         ServantAdapterConfig servantAdapterConfig = serverCfg.getServantAdapterConfMap().get(homeName);
 
         ServantAdapter ServerAdapter = new ServantAdapter(servantAdapterConfig);
         skeleton = new ServantHomeSkeleton(homeName, homeClassImpl, homeApiClazz, codecClazz, processorClazz, maxLoadLimit);
         skeleton.setAppContext(this);
+        //启动reacotr并开启服务端监听
         ServerAdapter.bind(skeleton);
         servantAdapterMap.put(homeName, ServerAdapter);
         return skeleton;

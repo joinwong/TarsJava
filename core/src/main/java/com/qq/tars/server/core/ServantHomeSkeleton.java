@@ -21,6 +21,9 @@ import java.lang.reflect.Method;
 import com.qq.tars.net.core.Processor;
 import com.qq.tars.rpc.protocol.Codec;
 
+/**
+ * Servant Skeleton
+ */
 public class ServantHomeSkeleton extends AppService {
 
     private String name = null;
@@ -42,6 +45,13 @@ public class ServantHomeSkeleton extends AppService {
         return servantImpl;
     }
 
+    /**
+     * 服务端method方法执行
+     * @param method
+     * @param args
+     * @return
+     * @throws Exception
+     */
     public Object invoke(Method method, Object... args) throws Exception {
         Object value = null;
         try {

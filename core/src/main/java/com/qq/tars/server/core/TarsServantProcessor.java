@@ -47,6 +47,10 @@ import com.qq.tars.support.trace.TraceManager;
 import java.util.List;
 import java.util.Random;
 
+/**
+ * TarsServantProcessor
+ * tarsserver.log
+ */
 public class TarsServantProcessor extends Processor {
 
     private static final String FLOW_SEP_FLAG = "|";
@@ -102,6 +106,12 @@ public class TarsServantProcessor extends Processor {
         return shortParam.replaceAll(" ", "_").replaceAll(" ", "_").replaceAll("\n", "+").replace(',', '，').replace('(', '（').replace(')', '）');
     }
 
+    /**
+     * 服务端这里处理真实的读请求
+     * @param req
+     * @param session
+     * @return
+     */
     @Override
     public Response process(Request req, Session session) {
 //        AppContainer container = null;
@@ -118,15 +128,18 @@ public class TarsServantProcessor extends Processor {
         try {
             oldClassLoader = Thread.currentThread().getContextClassLoader();
             request = (TarsServantRequest) req;
+            //创建response
             response = createResponse(request, session);
             response.setTicketNumber(req.getTicketNumber());
 
             if (response.getRet() != TarsHelper.SERVERSUCCESS || TarsHelper.isPing(request.getFunctionName())) {
                 return response;
             }
-            int maxWaitingTimeInQueue = ConfigurationManager.getInstance().getServerConfig().getServantAdapterConfMap().get(request.getServantName()).getQueueTimeout();
+            int maxWaitingTimeInQueue = ConfigurationManager.getInstance().getServerConfig()
+                    .getServantAdapterConfMap().get(request.getServantName()).getQueueTimeout();
             waitingTime = (int) (startTime - req.getBornTime());
             if (waitingTime > maxWaitingTimeInQueue) {
+                //默认10秒超时
                 throw new TarsException("Wait too long, server busy.");
             }
 
@@ -148,12 +161,14 @@ public class TarsServantProcessor extends Processor {
             if (appContext == null) throw new RuntimeException("failed to find the application named:[ROOT]");
 
 //            Thread.currentThread().setContextClassLoader(appContext.getAppContextClassLoader());
+            //dyeing
             preInvokeSkeleton();
             skeleton = appContext.getCapHomeSkeleton(request.getServantName());
             if (skeleton == null)
                 throw new RuntimeException("failed to find the servant named[" + request.getServantName() + "]");
             List<Filter> filters = AppContextManager.getInstance().getAppContext().getFilters(FilterKind.SERVER);
             FilterChain filterChain = new TarsServerFilterChain(filters, request.getServantName(), FilterKind.SERVER, skeleton);
+            //执行服务端方法
             filterChain.doFilter(request, response);
         } catch (Throwable cause) {
             cause.printStackTrace();
@@ -182,7 +197,9 @@ public class TarsServantProcessor extends Processor {
                 printServiceFlowLog(flowLogger, request, response.getRet(), (System.currentTimeMillis() - startTime), remark);
             }
             postInvokeSkeleton();
+            //上报waitingtime
             OmServiceMngr.getInstance().reportWaitingTimeProperty(waitingTime);
+            //上报服务端stat
             reportServerStat(request, response, startTime);
         }
         return response;
@@ -196,6 +213,13 @@ public class TarsServantProcessor extends Processor {
         }
     }
 
+    /**
+     * 上报到客户端调用本服务状态和耗时
+     * @param moduleName
+     * @param request
+     * @param response
+     * @param startTime
+     */
     private void reportServerStat(String moduleName, TarsServantRequest request, TarsServantResponse response,
                                   long startTime) {
         ServerConfig serverConfig = ConfigurationManager.getInstance().getServerConfig();
@@ -207,11 +231,16 @@ public class TarsServantProcessor extends Processor {
         Endpoint serverEndpoint = servantAdapterConfig.getEndpoint();
         String masterIp = request.getIoSession().getRemoteIp();
         int result = response.getRet() == TarsHelper.SERVERSUCCESS ? Constants.INVOKE_STATUS_SUCC : Constants.INVOKE_STATUS_EXEC;
-        InvokeStatHelper.getInstance().addProxyStat(request.getServantName()).addInvokeTimeByServer(moduleName, serverConfig.getApplication(), serverConfig.getServerName(), communicatorConfig.getSetName(), communicatorConfig.getSetArea(), communicatorConfig.getSetID(), request.getFunctionName(), (masterIp == null ? "0.0.0.0" : masterIp), serverEndpoint.host(), serverEndpoint.port(), result, (System.currentTimeMillis() - startTime));
+        InvokeStatHelper.getInstance().addProxyStat(request.getServantName())
+                .addInvokeTimeByServer(moduleName, serverConfig.getApplication(), serverConfig.getServerName(),
+                        communicatorConfig.getSetName(), communicatorConfig.getSetArea(), communicatorConfig.getSetID(),
+                        request.getFunctionName(), (masterIp == null ? "0.0.0.0" : masterIp),
+                        serverEndpoint.host(), serverEndpoint.port(), result, (System.currentTimeMillis() - startTime));
     }
 
     private TarsServantResponse createResponse(TarsServantRequest request, Session session) {
         TarsServantResponse response = new TarsServantResponse(session);
+        //复用request的ret值
         response.setRet(request.getRet());
         response.setVersion(request.getVersion());
         response.setPacketType(request.getPacketType());

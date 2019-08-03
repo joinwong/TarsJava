@@ -40,6 +40,9 @@ public class OmServiceMngr {
         return Instance;
     }
 
+    /**
+     * 初始化并且启动管理服务
+     */
     public void initAndStartOmService() {
         Communicator communicator = CommunicatorFactory.getInstance().getCommunicator();
         String app = ConfigurationManager.getInstance().getServerConfig().getApplication();
@@ -47,16 +50,23 @@ public class OmServiceMngr {
         String basePath = ConfigurationManager.getInstance().getServerConfig().getBasePath();
         String modualName = ConfigurationManager.getInstance().getServerConfig().getCommunicatorConfig().getModuleName();
 
+        //设置配置信息
         ConfigHelper.getInstance().setConfigInfo(communicator, app, serverName, basePath);
+        //写入node信息
         NodeHelper.getInstance().setNodeInfo(communicator, app, serverName);
+        //写入通知配置信息
         NotifyHelper.getInstance().setNotifyInfo(communicator, app, serverName);
+        //属性上报配置
         PropertyReportHelper.getInstance().setPropertyInfo(communicator, modualName);
+        //立刻上报服务端版本
         NodeHelper.getInstance().reportVersion(ClientVersion.getVersion());
 
+        //策略
         Policy avgPolicy = new CommonPropertyPolicy.Avg();
         Policy maxPolicy = new CommonPropertyPolicy.Max();
-        PropertyReportHelper.getInstance().createPropertyReporter(OmConstants.PropWaitTime, avgPolicy, maxPolicy);
 
+        //创建各种上报
+        PropertyReportHelper.getInstance().createPropertyReporter(OmConstants.PropWaitTime, avgPolicy, maxPolicy);
         PropertyReportHelper.getInstance().createPropertyReporter(OmConstants.PropHeapUsed, new MemoryHeapUsedAvg());
         PropertyReportHelper.getInstance().createPropertyReporter(OmConstants.PropHeapCommitted, new MemoryHeapCommittedAvg());
         PropertyReportHelper.getInstance().createPropertyReporter(OmConstants.PropHeapMax, new MemoryHeapMaxAvg());
@@ -66,8 +76,11 @@ public class OmServiceMngr {
             PropertyReportHelper.getInstance().createPropertyReporter(OmConstants.PropGcTime + gcMXBean.getName(), new GCTimeSum(gcMXBean.getName()));
         }
 
+        //服务端统计信息初始化
         ServerStatHelper.getInstance().init(communicator);
+        //todo:Trace初始化
         TarsTraceZipkinConfiguration.getInstance().init();
+        //启动各种定时器
         ScheduledServiceMngr.getInstance().start();
     }
 

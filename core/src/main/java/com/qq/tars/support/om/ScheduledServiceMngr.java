@@ -91,14 +91,20 @@ public class ScheduledServiceMngr {
         }
     }
 
+    /**
+     * 定时上报
+     */
     private void startHandleService() {
+        //每10秒上报心跳
         Runnable nodeHandler = new Thread(new NodeHandleThread(), "HeartBeat");
         taskExecutorManager.scheduleAtFixedRate(nodeHandler, 0, HEART_BEAT_INTERVAL, TimeUnit.SECONDS);
 
+        //每30秒上报服务端监测
         int initialDelay = REPORT_INTERVAL + (random.nextInt(30) * 1000);
         Runnable statHandler = new Thread(new StatHandleThread(), "ServerStat");
         taskExecutorManager.scheduleAtFixedRate(statHandler, initialDelay, REPORT_INTERVAL, TimeUnit.MILLISECONDS);
 
+        //属性上报最少30秒一次/
         if (REPORT_INTERVAL < PROPERTY_REPORT_MIN_INTERVAL) {
             REPORT_INTERVAL = PROPERTY_REPORT_MIN_INTERVAL;
         }

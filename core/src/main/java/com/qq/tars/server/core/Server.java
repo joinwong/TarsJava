@@ -45,6 +45,10 @@ public class Server {
         this.serverConfig = config;
     }
 
+    /**
+     * 启动server服务
+     * @param appContext
+     */
     public void startUp(AppContext appContext) {
         try {
 
@@ -57,8 +61,10 @@ public class Server {
             //启动app上线文
             startAppContext(appContext);
 
+            //启动session会话管理，剔除超时的会话[默认120秒]
             startSessionManager();
 
+            //注册hook，结束时关闭reactor
             registerServerHook();
 
             System.out.println("[SERVER] server is ready...");
@@ -77,10 +83,17 @@ public class Server {
         appContext.init();
     }
 
+    /**
+     * 开始服务管理
+     */
     public static void startManagerService() {
         OmServiceMngr.getInstance().initAndStartOmService();
     }
 
+    /**
+     * 初始化server communicator
+     * 设置bean
+     */
     public static void initCommunicator() {
         CommunicatorConfig config = ConfigurationManager.getInstance().getServerConfig().getCommunicatorConfig();
         Communicator communicator = CommunicatorFactory.getInstance().getCommunicator(config);
@@ -107,6 +120,9 @@ public class Server {
         ServerLogger.init();
     }
 
+    /**
+     * 加载服务器配置
+     */
     public static void loadServerConfig() {
         try {
             //解决TAF配置文件,初始化服务器配置
@@ -114,7 +130,9 @@ public class Server {
 
             ServerConfig cfg = ConfigurationManager.getInstance().getServerConfig();
             ServerLogger.initNamiCoreLog(cfg.getLogPath(), cfg.getLogLevel());
+            //设置UDP buffersize
             System.setProperty("com.qq.nami.server.udp.bufferSize", String.valueOf(cfg.getUdpBufferSize()));
+            //设置根目录
             System.setProperty("server.root", cfg.getBasePath());
         } catch (Throwable ex) {
             ex.printStackTrace(System.err);

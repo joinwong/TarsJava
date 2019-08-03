@@ -71,10 +71,14 @@ public class ConfigHelper {
 
     private synchronized boolean loadConfig(String fileName, boolean appConfigOnly) {
         try {
+            //拼接完整文件名
             String fullFileName = getConfFilePath(fileName);
+            //读取远程文件
             String newFile = getRemoteFile(fileName, appConfigOnly);
+            //新旧文件不一致
             if (new File(fullFileName).exists() && !FileUtil.readFileToString(fullFileName).equals(FileUtil.readFileToString(newFile))) {
                 for (int i = maxBakNum - 1; i >= 1; i--) {
+                    //备份,最高备份5份
                     String bakFileI = index2file(fullFileName, i);
                     if (new File(bakFileI).canRead()) {
                         localRename(bakFileI, index2file(fullFileName, i + 1));
@@ -84,6 +88,7 @@ public class ConfigHelper {
                     localRename(fullFileName, index2file(fullFileName, 1));
                 }
             }
+            //将新的文件写入本地
             localRename(newFile, fullFileName);
         } catch (TarsException e) {
             OmLogger.record("Config|load config failed: " + fileName, e);
@@ -113,6 +118,12 @@ public class ConfigHelper {
         return result;
     }
 
+    /**
+     * 拉取远程配置文件 并且写入本地
+     * @param fileName
+     * @param appConfigOnly
+     * @return
+     */
     private String getRemoteFile(String fileName, boolean appConfigOnly) {
         Holder<String> config = new Holder<String>();
         ConfigPrx configPrx = comm.stringToProxy(ConfigPrx.class, ConfigurationManager.getInstance().getServerConfig().getConfig());
@@ -136,6 +147,11 @@ public class ConfigHelper {
         return fullFileName + "." + index + ".bak";
     }
 
+    /**
+     * 本地文件重命名
+     * @param oldFile
+     * @param newFile
+     */
     private void localRename(String oldFile, String newFile) {
         File srcFile = new File(oldFile);
         File destFile = new File(newFile);

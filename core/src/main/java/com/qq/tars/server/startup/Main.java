@@ -43,6 +43,7 @@ public class Main {
         //服务性能/心跳/属性上报
         Server.startManagerService();
 
+        //判断服务端启动方式
         AppContext context = null;
         URL servantXML = Main.class.getClassLoader().getResource("servants.xml");
         if (servantXML != null) {
@@ -57,6 +58,7 @@ public class Main {
             System.out.println("[SERVER] servants profile does not exist, start failed.");
             throw new TarsException("servants profile does not exist");
         }
+        //启动
         new Server(ConfigurationManager.getInstance().getServerConfig()).startUp(context);
     }
 }

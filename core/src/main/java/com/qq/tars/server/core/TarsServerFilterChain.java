@@ -17,11 +17,18 @@ public class TarsServerFilterChain extends AbstractFilterChain<ServantHomeSkelet
 		super(filters, servant, kind, target);	
 	}
 
+	/**
+	 * 服务端真实的invoke
+	 * @param request
+	 * @param response
+	 * @throws Throwable
+	 */
 	@Override
 	protected void doRealInvoke(Request request, Response response)
 			throws Throwable {
 		if (request instanceof TarsServantRequest && target != null) {
 			TarsServantRequest tarsServantRequest = (TarsServantRequest)request;
+			//真实的服务端方法执行
 			Object value = target.invoke(tarsServantRequest.getMethodInfo().getMethod(), tarsServantRequest.getMethodParameters());
 			TarsServantResponse tarsServantResponse = (TarsServantResponse) response;
 			tarsServantResponse.setResult(value);

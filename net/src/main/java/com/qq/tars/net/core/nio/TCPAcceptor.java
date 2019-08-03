@@ -52,6 +52,11 @@ public class TCPAcceptor extends Acceptor {
         }
     }
 
+    /**
+     * 处理客户端的连接
+     * @param key
+     * @throws IOException
+     */
     public void handleAcceptEvent(SelectionKey key) throws IOException {
         //1. Accept TCP request
         ServerSocketChannel server = (ServerSocketChannel) key.channel();

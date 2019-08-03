@@ -28,6 +28,13 @@ public class TraceServerFilter implements Filter {
 		isTrace = ConfigurationManager.getInstance().getServerConfig().getSampleRate() > 0;
 	}
 
+	/**
+	 * 服务端过滤器
+	 * @param request
+	 * @param response
+	 * @param chain
+	 * @throws Throwable
+	 */
 	@Override
 	public void doFilter(Request request, Response response, FilterChain chain)
 			throws Throwable {

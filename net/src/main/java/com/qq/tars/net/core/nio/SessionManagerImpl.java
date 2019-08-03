@@ -90,6 +90,7 @@ public class SessionManagerImpl extends SessionManager {
                         //每隔30秒进行session超时判断
                         for (Session session : sessionList) {
                             lastUpdateOperationTime = session.getLastOperationTime();
+                            //默认120秒超时
                             if ((System.currentTimeMillis() - lastUpdateOperationTime) > timeout) {
                                 String s = "The session has timed out. [from ip: " + session.getRemoteIp() + " port: " + session.getRemotePort() + "]";
                                 System.out.println(s);

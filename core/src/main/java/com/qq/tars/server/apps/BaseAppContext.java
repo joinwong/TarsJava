@@ -55,15 +55,18 @@ public abstract class BaseAppContext implements AppContext {
     BaseAppContext() {
     }
 
+    /**
+     * Context上下文初始化
+     */
     @Override
     public void init() {
         try {
             //加载servant，由各个实现类
             loadServants();
             //inject om admin servant
-            //诸如管理servant
+            //注入管理servant
             injectAdminServant();
-            //初始化servant
+            //记录servant methodInfo
             initServants();
             //app上下文启动
             appContextStarted();
@@ -113,7 +116,7 @@ public abstract class BaseAppContext implements AppContext {
     }
 
     /**
-     * 初始化servant
+     * 记录servant的MethodInfo到内存中
      */
     void initServants() {
         for (String skeletonName : skeletonMap.keySet()) {
@@ -130,7 +133,8 @@ public abstract class BaseAppContext implements AppContext {
             }
         }
     }
-    
+
+    // TODO: 2019-08-03
     void loadDefaultFilter() {
     	filters.put(FilterKind.SERVER, new LinkedList<Filter>());
     	filters.put(FilterKind.CLIENT, new LinkedList<Filter>());

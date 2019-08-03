@@ -26,6 +26,9 @@ import com.qq.tars.support.node.prx.ServerFPrx;
 import com.qq.tars.support.node.prx.ServerInfo;
 import com.qq.tars.support.om.OmLogger;
 
+/**
+ * Node帮助类
+ */
 public class NodeHelper {
 
     private static final NodeHelper Instance = new NodeHelper();
@@ -44,6 +47,9 @@ public class NodeHelper {
         communicator = comm;
     }
 
+    /**
+     * 保持心跳
+     */
     public void keepAlive() {
         try {
             if (communicator == null) {
@@ -60,6 +66,10 @@ public class NodeHelper {
         }
     }
 
+    /**
+     * 上报版本
+     * @param version
+     */
     public void reportVersion(String version) {
         try {
             if (communicator == null) {

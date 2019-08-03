@@ -135,11 +135,13 @@ public class TCPSession extends Session {
                 if (request != null) {
                     try {
                         request.resetBornTime();
+                        //处理真实的request读请求
                         selectorManager.getThreadPool().execute(new WorkThread(request, selectorManager));
                     } catch (Exception ex) {
                         ex.printStackTrace();
                     }
                 } else {
+                    //这里需要注意，如果读取的buffer不足，将循环重新读取
                     tempBuffer.reset();
                     readBuffer = resetIoBuffer(tempBuffer);
                     break;

@@ -105,14 +105,18 @@ public class ServerConfig {
             }
         }
 
+        //管理进程
         ServantAdapterConfig adminServantAdapterConfig = new ServantAdapterConfig();
         adminServantAdapterConfig.setEndpoint(local);
         adminServantAdapterConfig.setServant(String.format("%s.%s.%s", application, serverName, OmConstants.AdminServant));
         servantAdapterConfMap.put(OmConstants.AdminServant, adminServantAdapterConfig);
 
+        //日志路径
         if (application != null && serverName != null && logPath != null) {
             logPath = logPath + File.separator + application + File.separator + serverName;
         }
+
+        //客户端通讯器配置
         communicatorConfig = new CommunicatorConfig().load(conf);
         if (logPath != null) {
             communicatorConfig.setLogPath(logPath);

@@ -102,6 +102,11 @@ public class ServantAdapter implements Adapter {
     }
 
 
+    /**
+     * 绑定AppService
+     * @param appService
+     * @throws IOException
+     */
     public void bind(AppService appService) throws IOException {
         this.skeleton = (ServantHomeSkeleton) appService;
         ServerConfig serverCfg = ConfigurationManager.getInstance().getServerConfig();
@@ -113,10 +118,12 @@ public class ServantAdapter implements Adapter {
 
         Endpoint endpoint = this.servantAdapterConfig.getEndpoint();
         if (endpoint.type().equals("tcp")) {
+            //启动recator
             this.selectorManager = new SelectorManager(Utils.getSelectorPoolSize(), new ServantProtocolFactory(codec), threadPool, processor, keepAlive, "server-tcp-reactor", false);
             this.selectorManager.setTcpNoDelay(serverCfg.isTcpNoDelay());
             this.selectorManager.start();
 
+            //开启ACCEPT监听
             System.out.println("[SERVER] server starting at " + endpoint + "...");
             ServerSocketChannel serverChannel = ServerSocketChannel.open();
             serverChannel.socket().bind(new InetSocketAddress(endpoint.host(), endpoint.port()), 1024);
@@ -153,6 +160,7 @@ public class ServantAdapter implements Adapter {
     private Processor createProcessor(ServerConfig serverCfg) throws TarsException {
         Processor processor = null;
         Class<? extends Processor> processorClass = skeleton.getProcessorClass();
+        //默认TarsServantProcessor
         if (processorClass == null) {
             return new TarsServantProcessor();
         }
@@ -179,6 +187,7 @@ public class ServantAdapter implements Adapter {
             }
         }
 
+        //默认TarsCodec
         if (codecClass == null) {
             codecClass = TarsCodec.class;
         }
