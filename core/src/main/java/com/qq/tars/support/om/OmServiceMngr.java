@@ -56,7 +56,7 @@ public class OmServiceMngr {
         NodeHelper.getInstance().setNodeInfo(communicator, app, serverName);
         //写入通知配置信息
         NotifyHelper.getInstance().setNotifyInfo(communicator, app, serverName);
-        //属性上报配置
+        //特性属性上报配置
         PropertyReportHelper.getInstance().setPropertyInfo(communicator, modualName);
         //立刻上报服务端版本
         NodeHelper.getInstance().reportVersion(ClientVersion.getVersion());
