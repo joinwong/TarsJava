@@ -93,6 +93,7 @@ public final class Reactor extends Thread {
         try {
             while (!Thread.interrupted()) {
                 selector.select();
+                //处理注册队列
                 processRegister();
                 Iterator<SelectionKey> iter = selector.selectedKeys().iterator();
                 while (iter.hasNext()) {
@@ -114,6 +115,7 @@ public final class Reactor extends Thread {
                         disConnectWithException(key, ex);
                     }
                 }
+                //处理未注册队列
                 processUnRegister();
             }
         } catch (Throwable e) {

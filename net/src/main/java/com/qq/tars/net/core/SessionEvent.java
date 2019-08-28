@@ -16,6 +16,9 @@
 
 package com.qq.tars.net.core;
 
+/**
+ * Session 事件
+ */
 @SuppressWarnings("serial")
 public class SessionEvent extends java.util.EventObject {
 

@@ -79,7 +79,7 @@ public final class WorkThread implements Runnable {
                 req.setProcessTime(System.currentTimeMillis());
                 //解析数据流
                 req.init();
-                //这里拿到processtor处理request
+                //这里拿到processor处理request
                 Response res = selectorManager.getProcessor().process(req, req.getIoSession());
                 //非异步模式，TCPSession写入response
                 if (!res.isAsyncMode()) req.getIoSession().write(res);

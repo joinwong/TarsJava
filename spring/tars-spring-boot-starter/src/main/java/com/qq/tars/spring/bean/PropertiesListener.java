@@ -38,6 +38,7 @@ public class PropertiesListener implements ApplicationListener<ApplicationEnviro
         if (sources != null) {
             for (String name : sources.value()) {
                 try {
+                    //拉取远程日志文件
                     ConfigHelper.getInstance().loadConfig(name);
                     File config = new File(configPath + name);
 

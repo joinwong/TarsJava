@@ -31,8 +31,8 @@ public class TarsServantRequest extends ServantRequest implements java.io.Serial
 
     private static final long serialVersionUID = 1L;
 
-    private short version;
-    private byte packetType;
+    private short version; //tag1
+    private byte packetType;//tag2
     private int messageType;
     private String servantName;
     private String functionName;

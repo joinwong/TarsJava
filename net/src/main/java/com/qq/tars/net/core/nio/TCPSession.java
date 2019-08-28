@@ -175,7 +175,8 @@ public class TCPSession extends Session {
 
                 if (response != null) {
                     try {
-                        if (response.getTicketNumber() == Ticket.DEFAULT_TICKET_NUMBER) response.setTicketNumber(response.getSession().hashCode());
+                        if (response.getTicketNumber() == Ticket.DEFAULT_TICKET_NUMBER)
+                            response.setTicketNumber(response.getSession().hashCode());
                         selectorManager.getThreadPool().execute(new WorkThread(response, selectorManager));
                     } catch (Exception ex) {
                         ex.printStackTrace();

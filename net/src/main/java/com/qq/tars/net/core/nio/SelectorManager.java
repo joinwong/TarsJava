@@ -57,6 +57,9 @@ public final class SelectorManager {
                            Processor processor, boolean keepAlive, String reactorNamePrefix, boolean udpMode) throws IOException {
         if (udpMode) selectorPoolSize = 1;
 
+        //Reactor 反应堆的核心数
+        //server CPU核数计算
+        //client 默认2
         this.selectorPoolSize = selectorPoolSize;
         this.protocolFactory = protocolFactory;
         this.threadPool = threadPool;
