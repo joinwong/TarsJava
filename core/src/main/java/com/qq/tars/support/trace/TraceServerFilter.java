@@ -22,7 +22,10 @@ import com.qq.tars.server.config.ConfigurationManager;
 public class TraceServerFilter implements Filter {
 	
 	private volatile boolean isTrace = false;
-	
+
+	/**
+	 * 是否开启Trace
+	 */
 	@Override
 	public void init() {
 		isTrace = ConfigurationManager.getInstance().getServerConfig().getSampleRate() > 0;
@@ -39,6 +42,7 @@ public class TraceServerFilter implements Filter {
 	public void doFilter(Request request, Response response, FilterChain chain)
 			throws Throwable {
 		if (!isTrace || !(request instanceof TarsServantRequest)) {
+			//未开启直接返回
 			chain.doFilter(request, response);
 		} else {
 			

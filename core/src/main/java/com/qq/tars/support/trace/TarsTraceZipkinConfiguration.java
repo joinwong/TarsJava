@@ -36,22 +36,31 @@ public class TarsTraceZipkinConfiguration {
 	public static TarsTraceZipkinConfiguration getInstance() {
 		return instance;
 	}
-	
+
+	/**
+	 * Trace初始化
+	 */
 	public void init() {
 		isTrace = serverConfig.getSampleRate() > 0;
 		if (isTrace) {
 			try {
 				createSender();
+
 				reporter = AsyncReporter.builder(sender).build();
 				Map<String, Tracer> traces = new HashMap<String, Tracer>();
+
 				for (String servant : serverConfig.getServantAdapterConfMap().keySet()) {
 					if (!servant.equals(OmConstants.AdminServant)) {
-						Tracing tracing = Tracing.newBuilder().localServiceName(servant)
-								.spanReporter(reporter).sampler(brave.sampler.Sampler.create(serverConfig.getSampleRate())).build();
+						Tracing tracing = Tracing.newBuilder()
+								.localServiceName(servant)
+								.spanReporter(reporter)
+								.sampler(brave.sampler.Sampler.create(serverConfig.getSampleRate()))
+								.build();
 						Tracer tracer = BraveTracer.create(tracing);
 						traces.put(servant, tracer);
 					}
 				}
+
 				TraceManager.getInstance().putTracers(traces);
 			} catch (Exception e) {
 				e.printStackTrace();

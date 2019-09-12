@@ -27,6 +27,9 @@ public class TraceClientFilter implements Filter {
 
 	private boolean isTrace = false;
 
+	/**
+	 * 是否开启Trace
+	 */
 	@Override
 	public void init() {
 		isTrace = ConfigurationManager.getInstance().getServerConfig().getSampleRate() > 0;
